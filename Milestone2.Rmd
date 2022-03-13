@@ -1,0 +1,162 @@
+---
+title: "Milestone2"
+author: "Mikayla Lamping"
+date: "3/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+```
+
+
+# Check for potential data quality issues
+
+```{r}
+maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
+```
+
+```{r}
+# No missing values
+sum(maternal_risk %>%
+  is.na())
+```
+Variable definitions from Kaggle:
+- Age: Age in years when a woman is pregnant.
+- SystolicBP: Upper value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+- DiastolicBP: Lower value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+- BS: Blood glucose levels is in terms of a molar concentration, mmol/L.
+- HeartRate: A normal resting heart rate in beats per minute.
+- Risk Level: Predicted Risk Intensity Level during pregnancy considering the previous attribute.
+
+```{r}
+summary(maternal_risk)
+```
+
+HeartRate seems to have at least one outlier, as the minimum is only 7 but the majority of the points are in the 70-80 bpm range.
+
+### Check for duplicate entries
+```{r}
+maternal_risk %>%
+  distinct()
+```
+
+There appear to be many duplicates, as distinct() reduced the number of rows from 1014 to just 452. It does seem that the duplicate entries still represent different people and they just happened to have the same measurements, so these entries should still be included as we proceed with our analysis.
+
+
+
+# Build intuition about individual variables
+
+```{r}
+histogram <- function(colname) {
+  maternal_risk %>%
+    ggplot() +
+    geom_histogram(aes(x = .data[[colname]]))
+}
+```
+
+### Age
+```{r}
+histogram("Age")
+```
+
+Age ranges from 10 to 70, with the majority between 15 and 25, which is expected.
+
+### SystolicBP
+```{r}
+histogram("SystolicBP")
+```
+
+Small number of entries with SystolicBP above 150. What are their risk levels?
+```{r}
+maternal_risk %>%
+  filter(SystolicBP > 150)
+```
+
+All ten rows are identical and classify each as high risk, which is expected given that these entries are outliers.
+
+### DiastolicBP
+```{r}
+histogram("DiastolicBP")
+```
+
+Fairly evenly distributed. Check under 50 group.
+```{r}
+maternal_risk %>%
+  filter(DiastolicBP < 50)
+```
+
+25 entries with Diastolic blood pressure less than 50 (all 49). All are classified as low risk, so upon initial exploration, these low DiastolicBP outliers don't seem to increase risk level.
+
+### Blood Sugar
+```{r}
+histogram("BS")
+```
+
+The majority are under 10, but there are many entries spread between 10 and 20. Do these have higher risk level?
+```{r}
+maternal_risk %>%
+  filter(BS > 10) %>%
+  group_by(RiskLevel) %>%
+  summarise(count = n())
+```
+
+Yes, the majority of the entries with a blood sugar level greater than 10 are classified as high risk. This is a factor we should explore further, as this seems to indicate that high values of BP correlate with higher risk level.
+
+### Body Temperature
+```{r}
+histogram("BodyTemp")
+```
+
+The majority are in the normal temperature range (~98-99).
+```{r}
+maternal_risk %>%
+  filter(BodyTemp > 100) %>%
+  group_by(RiskLevel) %>%
+  summarise(count = n())
+```
+
+There doesn't seem to be a super strong correlation, but there are more mid to high risk entries than low risk in the group of higher body temperatures.
+
+
+### HeartRate
+```{r}
+histogram("HeartRate")
+```
+
+There is a major outlier, with heart rate less than 10.
+```{r}
+maternal_risk %>%
+  filter(HeartRate < 25)
+```
+HeartRate may have been entered incorrectly? This person is classified as low risk but has a heart rate of just 7, while the majority of heart rates in this dataset are around 70 bpm.
+
+
+### Risk Level
+```{r}
+# Plot discrete histogram (RiskLevel)
+maternal_risk %>%
+  ggplot() +
+  geom_histogram(aes(x = RiskLevel), stat = "count")
+```
+
+Risk level mainly low but fairly evenly dispersed.
+```{r}
+maternal_risk %>%
+  count(RiskLevel)
+```
+
+The order of the levels isn't intuitive - modify this in next step.
+
+
+# Prepare processed data
+RiskLevel in order that doesn't make sense for plotting. Update factor to have levels increase from low to high.
+```{r}
+risks <- (c("low risk", "mid risk", "high risk"))
+
+maternal_risk2 <- maternal_risk %>%
+  mutate(RiskLevel = factor(RiskLevel, levels = risks))
+```
+
