@@ -1,0 +1,4 @@
+﻿setting,caregiver,prolapsed_cord,uterine_rupture,postpartum_hemorrhage,blood_transfusion,obstetric_shock,death,placenta_removal,uterine_prolapse,pyrexia,uti,puerpural_fever,wound_infection,no_tear,first_second_degree,third_fourth_degree,unknown_degree,cervical_tear,total
+home,midwife,2,0,110,2,1,0,28,1,19,0,1,0,1578,1262,34,25,2,2899
+hospital,midwife,6,0,285,10,1,0,85,1,68,1,4,11,2189,2387,137,39,5,4752
+hospital,physician,9,2,357,15,1,0,90,2,154,5,7,16,2291,2836,183,21,4,5331

@@ -2,17 +2,21 @@
 title: "Milestone2"
 author: "Mikayla Lamping"
 date: "3/13/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(tidyverse)
+library(patchwork)
 ```
 
+# Maternal Risk
 
-# Check for potential data quality issues
+## Check for potential data quality issues
 
 ```{r}
 maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
@@ -23,13 +27,21 @@ maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
 sum(maternal_risk %>%
   is.na())
 ```
+
 Variable definitions from Kaggle:
+
 - Age: Age in years when a woman is pregnant.
+
 - SystolicBP: Upper value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+
 - DiastolicBP: Lower value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+
 - BS: Blood glucose levels is in terms of a molar concentration, mmol/L.
+
 - HeartRate: A normal resting heart rate in beats per minute.
+
 - Risk Level: Predicted Risk Intensity Level during pregnancy considering the previous attribute.
+
 
 ```{r}
 summary(maternal_risk)
@@ -47,7 +59,7 @@ There appear to be many duplicates, as distinct() reduced the number of rows fro
 
 
 
-# Build intuition about individual variables
+## Build intuition about individual variables
 
 ```{r}
 histogram <- function(colname) {
@@ -151,7 +163,7 @@ maternal_risk %>%
 The order of the levels isn't intuitive - modify this in next step.
 
 
-# Prepare processed data
+## Prepare processed data
 RiskLevel in order that doesn't make sense for plotting. Update factor to have levels increase from low to high.
 ```{r}
 risks <- (c("low risk", "mid risk", "high risk"))
@@ -163,13 +175,46 @@ maternal_risk2 <- maternal_risk %>%
 \bigskip
 
 # Global Mortality
-```{r fig.height = 24, fig.width = 12}
-library(tidyverse)
-library(ggplot2)
-library(patchwork)
 
-global <- read_csv("global_mortality.csv") %>%
+## Check for potential data quality issues
+
+```{r}
+global <- read_csv("global_mortality.csv")
+```
+
+```{r}
+# no missing values in data we care about
+sum(global %>%
+      select(c(`Neonatal deaths (%)`, `Maternal deaths (%)`)) %>%
+      is.na())
+```
+Key Variables:
+- Maternal deaths (%): Percentage of all deaths in a given country & year where the cause was linked to maternal/childbirth complications
+- Neonatal deaths (%): Percentage of all deaths in a given country & year where death occurred within the first 28 days of life
+
+```{r}
+summary(global[c(1, 10, 25)])
+```
+
+### Check for duplicate entries
+```{r}
+# same size as original dataset, no duplicates
+nrow(global %>% distinct())
+length(global %>% distinct())
+```
+
+## Prepare processed data
+
+```{r}
+# keep most recent year
+global <- global %>%
   filter(year == 2016)
+```
+
+## Build intuition about individual variables
+
+```{r fig.height = 24, fig.width = 12}
+global <- read_csv("global_mortality.csv") 
 
 countries1 <- ggplot(global) +
   geom_col(aes(`Neonatal deaths (%)`, reorder(country, `Neonatal deaths (%)`), fill = country)) +
@@ -192,10 +237,112 @@ countries1 + countries2
 
 # Interventions & Maternal Outcomes
 
-```{r fig.height = 6, fig.width = 8}
+## Check for potential data quality issues
+
+The following .csv files were hand-generated from the cited paper (more details in the write-up).
+
+```{r}
 interventions <- read_csv("interventions.csv")
 outcomes <- read_csv("maternal_outcomes.csv")
+```
 
+```{r}
+# no missing values
+sum(interventions %>%
+      is.na())
+```
+```{r}
+sum(outcomes %>%
+      is.na())
+```
+
+"interventions" Variables:
+
+Number of pregnant people who had...
+
+- external_tocomoter: external electronic fetal monitoring
+
+- fetal_scalp_electrode: internal electronic fetal monitoring
+
+- amniotomy: purposeful puncturing of the amniotic sac 
+
+- oxytocin: drug used to induce labor, brand name Pitocin
+
+- nitrous_oxide: "laughing gas"
+
+- epidural: numbing prodeduce for the lower part of the body
+
+- narcotic: pain-relieving drugs
+
+- spontaneous_vaginal: vaginal birth without forceps or other mechanical interventions
+
+- assisted_vaginal: vaginal birth with mechanical assistance
+
+- cesarean: birth via cesarean-section surgery
+
+- episiotomy: cutting of the perineum for vaginal birth
+
+total: total number in each birth setting/caregiver (same as below)
+
+
+"outcomes" variables:
+
+Number of pregnant people who experienced...
+
+- prolapsed_cord: a prolapsed umbilical cord
+
+- uterine_rupture: a ruputure of the uterus
+
+- postpartum_hemorrhage: hemorrhaging after giving birth
+
+- blood_transfusion: requiring a blood transfusion
+
+- obstetric_shock: shock, usually caused by excessive blood loss
+
+- death	
+
+- placenta_removal: manual removal of the placenta (rather than natural expulsion)	
+
+- uterine_prolapse: a prolapsed uterus
+
+- pyrexia: fever
+
+- uti: urinary tract infection
+
+- puerpural_fever: prolonged fever immediately after giving birth
+
+- wound_infection: infection at the site of a wound	
+
+- no_tear: no tearing from birth	
+
+- first_second_degree: first or second degree tears
+
+- third_fourth_degree: third or fourth degree tears
+
+- unknown_degree: tearing of unknown degree
+
+- cervical_tear: tearing of the cervix
+
+total: total number in each birth setting/caregiver (same as above)
+
+
+```{r}
+summary(interventions)
+```
+
+```{r}
+summary(outcomes)
+```
+
+Some variables have a very low sample size/count, which is not as useful for visualization.
+
+### Check for duplicate entries
+
+As these two .csv's were made by hand (and are very small overall), we verify there are no duplicate entries.
+
+## Prepare processed data
+
+```{r}
 interventions_ratios <- interventions %>%
   mutate_at(vars(-c(setting, caregiver, total)), funs(./total)) %>%
   unite("birth_plan", c(setting, caregiver), sep = ", ")
@@ -204,6 +351,11 @@ outcomes_ratios <- outcomes %>%
   mutate_at(vars(-c(setting, caregiver, total)), funs(./total)) %>%
   unite("birth_plan", c(setting, caregiver), sep = ", ")
 
+```
+
+## Build intuition about individual variables
+
+```{r fig.height = 6, fig.width = 8}
 i1 <- ggplot(interventions_ratios) +
   geom_col(aes(birth_plan, cesarean, fill = birth_plan)) +
   theme(axis.text = element_text(size = 1)) +
