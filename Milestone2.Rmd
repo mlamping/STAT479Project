@@ -350,7 +350,6 @@ interventions_ratios <- interventions %>%
 outcomes_ratios <- outcomes %>%
   mutate_at(vars(-c(setting, caregiver, total)), funs(./total)) %>%
   unite("birth_plan", c(setting, caregiver), sep = ", ")
-
 ```
 
 ## Build intuition about individual variables
@@ -384,5 +383,39 @@ i4 <- ggplot(interventions_ratios) +
   guides(fill="none") +
   xlab("")
 
-(i1 + i2) / (i3 + i4)
+((i1 + i2) / (i3 + i4)) + 
+    plot_annotation(title = "Interventions")
+```
+
+```{r fig.height = 6, fig.width = 8}
+o1 <- ggplot(outcomes_ratios) +
+  geom_col(aes(birth_plan, blood_transfusion, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() +
+  guides(fill="none") +
+  xlab("")
+
+o2 <- ggplot(outcomes_ratios) +
+  geom_col(aes(birth_plan, pyrexia, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+o3 <- ggplot(outcomes_ratios) +
+  geom_col(aes(birth_plan, no_tear, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+o4 <- ggplot(outcomes_ratios) +
+  geom_col(aes(birth_plan, third_fourth_degree, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+((o1 + o2) / (o3 + o4)) + 
+    plot_annotation(title = "Outcomes")
 ```
