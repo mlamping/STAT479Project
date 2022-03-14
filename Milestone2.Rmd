@@ -3,8 +3,8 @@ title: "Milestone2"
 author: "Mikayla Lamping"
 date: "3/13/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
