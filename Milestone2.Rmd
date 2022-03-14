@@ -160,3 +160,77 @@ maternal_risk2 <- maternal_risk %>%
   mutate(RiskLevel = factor(RiskLevel, levels = risks))
 ```
 
+\bigskip
+
+# Global Mortality
+```{r fig.height = 24, fig.width = 12}
+library(tidyverse)
+library(ggplot2)
+library(patchwork)
+
+global <- read_csv("global_mortality.csv") %>%
+  filter(year == 2016)
+
+countries1 <- ggplot(global) +
+  geom_col(aes(`Neonatal deaths (%)`, reorder(country, `Neonatal deaths (%)`), fill = country)) +
+  ylab(label = "") +
+  theme(axis.text = element_text(size = 2)) +
+  theme_minimal() + 
+  guides(fill="none")
+
+countries2 <- ggplot(global) + 
+  geom_col(aes(`Maternal deaths (%)`, reorder(country, `Maternal deaths (%)`), fill = country)) +
+  ylab(label = "") +
+  theme(axis.text = element_text(size = 2)) +
+  theme_minimal() + 
+  guides(fill="none")
+
+countries1 + countries2
+```
+
+\bigskip
+
+# Interventions & Maternal Outcomes
+
+```{r fig.height = 6, fig.width = 8}
+interventions <- read_csv("interventions.csv")
+outcomes <- read_csv("maternal_outcomes.csv")
+
+interventions_ratios <- interventions %>%
+  mutate_at(vars(-c(setting, caregiver, total)), funs(./total)) %>%
+  unite("birth_plan", c(setting, caregiver), sep = ", ")
+
+outcomes_ratios <- outcomes %>%
+  mutate_at(vars(-c(setting, caregiver, total)), funs(./total)) %>%
+  unite("birth_plan", c(setting, caregiver), sep = ", ")
+
+i1 <- ggplot(interventions_ratios) +
+  geom_col(aes(birth_plan, cesarean, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() +
+  guides(fill="none") +
+  xlab("")
+
+i2 <- ggplot(interventions_ratios) +
+  geom_col(aes(birth_plan, oxytocin, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+i3 <- ggplot(interventions_ratios) +
+  geom_col(aes(birth_plan, epidural, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+i4 <- ggplot(interventions_ratios) +
+  geom_col(aes(birth_plan, episiotomy, fill = birth_plan)) +
+  theme(axis.text = element_text(size = 1)) +
+  theme_minimal() + 
+  guides(fill="none") +
+  xlab("")
+
+(i1 + i2) / (i3 + i4)
+```
