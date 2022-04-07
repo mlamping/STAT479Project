@@ -1,0 +1,174 @@
+---
+title: "Milestone3Maternal"
+author: "Mikayla Lamping"
+date: "4/7/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+library(patchwork)
+```
+
+# Maternal Risk
+
+## Check for potential data quality issues
+
+```{r}
+maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
+
+# update risk factor levels
+risks <- (c("low risk", "mid risk", "high risk"))
+maternal_risk <- maternal_risk %>%
+  mutate(RiskLevel = factor(RiskLevel, levels = risks)) %>%
+  filter(HeartRate > 10) # remove outlier with HeartRate of 7
+```
+
+Variable definitions from Kaggle:
+
+- Age: Age in years when a woman is pregnant.
+
+- SystolicBP: Upper value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+
+- DiastolicBP: Lower value of Blood Pressure in mmHg, another significant attribute during pregnancy.
+
+- BS: Blood glucose levels is in terms of a molar concentration, mmol/L.
+
+- HeartRate: A normal resting heart rate in beats per minute.
+
+- Risk Level: Predicted Risk Intensity Level during pregnancy considering the previous attribute.
+
+
+## Milestone 2: Build intuition about individual variables
+
+```{r}
+histogram <- function(colname) {
+  maternal_risk %>%
+    ggplot() +
+    geom_histogram(aes(x = .data[[colname]]))
+}
+```
+
+### Age
+Age ranges from 10 to 70, with the majority between 15 and 25, which is expected.
+
+### SystolicBP
+Small number of entries with SystolicBP above 150. What are their risk levels?
+```{r}
+maternal_risk %>%
+  filter(SystolicBP > 150)
+```
+
+All ten rows are identical and classify each as high risk, which is expected given that these entries are outliers.
+
+### DiastolicBP
+Fairly evenly distributed. Check under 50 group.
+```{r}
+maternal_risk %>%
+  filter(DiastolicBP < 50)
+```
+
+25 entries with Diastolic blood pressure less than 50 (all 49). All are classified as low risk, so upon initial exploration, these low DiastolicBP outliers don't seem to increase risk level.
+
+### Blood Sugar
+```{r}
+histogram("BS")
+```
+
+The majority are under 10, but there are many entries spread between 10 and 20. Do these have higher risk level?
+```{r}
+maternal_risk %>%
+  filter(BS > 10) %>%
+  group_by(RiskLevel) %>%
+  summarise(count = n())
+```
+
+Yes, the majority of the entries with a blood sugar level greater than 10 are classified as high risk. This is a factor we should explore further, as this seems to indicate that high values of BP correlate with higher risk level.
+
+### Body Temperature
+```{r}
+histogram("BodyTemp")
+```
+
+The majority are in the normal temperature range (~98-99).
+
+There doesn't seem to be a super strong correlation, but there are more mid to high risk entries than low risk in the group of higher body temperatures.
+
+
+\bigskip
+# Milestone 3: Investigating which factors correlate most with high risk
+
+```{r}
+maternal_risk %>%
+  ggplot() +
+  geom_point(aes(Age, BS, col = RiskLevel)) +
+  facet_wrap(~ RiskLevel)
+```
+
+BS appears to have stronger influence than age. Higher blood sugar seems to correlate with higher risk.
+
+```{r}
+histogram("Age") +
+  facet_wrap(~ RiskLevel)
+
+histogram("BS") +
+  facet_wrap(~ RiskLevel)
+
+histogram("DiastolicBP") +
+  facet_wrap(~ RiskLevel)
+
+histogram("SystolicBP") +
+  facet_wrap(~ RiskLevel)
+
+histogram("BodyTemp") +
+  facet_wrap(~ RiskLevel) # doesn't seem to have very strong effect
+
+histogram("HeartRate") +
+  facet_wrap(~ RiskLevel)
+```
+
+```{r}
+cor(maternal_risk$SystolicBP, maternal_risk$DiastolicBP)
+maternal <- maternal_risk %>%
+  select(-RiskLevel)
+
+mat <- maternal_risk %>%
+  mutate(RiskLevel = case_when(RiskLevel == "low risk" ~ 0,
+                          RiskLevel == "mid risk" ~ 0.5,
+                          RiskLevel == "high risk" ~ 1))
+
+cor(mat)
+```
+
+Systolic and diastolic bp highly correlated - consider together in analysis. 
+
+Risk level seems to be most highly correlated with BS, then BPs, then Age.
+```{r}
+maternal_risk %>%
+  ggplot() +
+  geom_boxplot(aes(BS, RiskLevel, col = RiskLevel))
+
+maternal_risk %>%
+  ggplot() +
+  geom_point(aes(DiastolicBP, SystolicBP, col = RiskLevel)) +
+  facet_wrap(~ RiskLevel)
+
+maternal_risk %>%
+  ggplot() +
+  geom_boxplot(aes(Age, RiskLevel, col = RiskLevel))
+```
+
+* interpretation of these plots:
+  - clear confirmation of direct correlation: higher values of each of these variables correlate with higher risk levels.
+  - Systolic and Diastolic BP are correlated, and high risk mothers often have high values of both.
+  - Pregnancy risk does appear to increase with age, though there are many outliers of women aged 50-70 still being classified as low risk and some in mid-twenties being classified as high risk. Possibly due to age increasing likelihood of high values of other factors like BP and BS?
+  
+* explore Age's influence on the other factors (from above correlation matrix, age is positively correlated with every factor except body temp, which we have found to be of little influence). Therefore Age on its own may not be an indicator of higher-risk pregnancies, but rather an indication of a higher probability of high values of other risk factors
+
+* explore how they interact, specifically with Age (ex: BS and BPs influence on risk)
+
+
