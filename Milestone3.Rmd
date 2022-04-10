@@ -10,6 +10,14 @@ knitr::opts_chunk$set(echo = FALSE)
 library(readr)
 library(tidyverse)
 library(patchwork)
+library(tidymodels)
+library(rgeos)
+library(rworldmap)
+library(rworldxtra)
+library(tibble)
+library(ggmap)
+library(spData)
+library(sf)
 ```
 
 # Maternal and Fetal Heath Factors and Outcomes
@@ -31,14 +39,28 @@ haq <- read_csv("haq_index.csv") %>%
          Entity = NULL,
          `HAQ Index (IHME (2017))` = NULL) %>%
   select(c(country, haq))
+```
 
+```{r}
 countries <- intersect(mortality$country, haq$country)
 mortality <- mortality %>%
   filter(country %in% countries)
 haq <- haq %>%
   filter(country %in% countries)
 
-global <- inner_join(mortality, haq)
+global_ <- inner_join(mortality, haq)
+```
+
+```{r}
+wmap <- getMap(resolution="high")
+centroids <- gCentroid(wmap, byid = TRUE)
+
+locs <- as.data.frame(centroids) %>%
+  rownames_to_column("country")
+locs$country[236] = "United States"
+
+global <- inner_join(global_, locs) %>%
+  drop_na()
 ```
 
 ```{r fig.height = 24, fig.width = 18}
@@ -63,7 +85,29 @@ haq <- ggplot(global) +
   theme_minimal() + 
   guides(fill="none")
 
-neonatal + maternal + haq
+#neonatal + maternal + haq
+```
+
+```{r fig.height = 15, fig.width = 20}
+world_map <- world %>%
+  filter(continent != "Antarctica")
+
+global <- global %>%
+  mutate(avg_mortality = rowMeans(select(., c(maternal, neonatal)), na.rm = TRUE))
+
+p1 <- ggplot() +
+  geom_sf(data = world_map, fill = "white") +
+  geom_point(data = global, aes(x, y, size = haq, col = maternal)) +
+  scale_color_distiller(palette = "RdPu", direction = 1) +
+  theme_void()
+
+p2 <- ggplot() +
+  geom_sf(data = world_map, fill = "white") +
+  geom_point(data = global, aes(x, y, size = haq, col = neonatal)) +
+  scale_color_distiller(palette = "YlOrBr", direction = 1) +
+  theme_void()
+
+p1 / p2 + plot_layout(guides = "collect")
 ```
 
 
