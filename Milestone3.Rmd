@@ -18,6 +18,7 @@ library(tibble)
 library(ggmap)
 library(spData)
 library(sf)
+library(ggrepel)
 ```
 
 # What Influences the Decision to Have or Not Have Children?
@@ -79,6 +80,20 @@ ggplot() +
 ```
 
 ```{r}
+suppressWarnings(print(ggplot(global) +
+  geom_point(aes(haq, maternal), size = 0.5) +
+  geom_text_repel(aes(haq, maternal, 
+                      label = ifelse(maternal > 1.5 & haq < 55 | maternal < 0.04 & haq > 88, country, ''),
+                      segment.size = 0.2), 
+                  size = 2, max.overlaps = 27) +
+  labs(title = "Maternal Mortality Rate vs. Heathcare Access and Quality Index", 
+       x = "HAQ Index", 
+       y = "Maternal Mortality Rate") +
+  theme_minimal()
+))
+```
+
+```{r}
 high_maternal <- global %>%
   top_n(n = 10, wt = maternal)
 
@@ -86,9 +101,8 @@ low_maternal <- global %>%
   top_n(n = -10, wt = maternal)
 ```
 
-
 ```{r}
-low <- ggplot(low_maternal) +
+maternal_low <- ggplot(low_maternal) +
   geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
   scale_fill_distiller(palette = "RdPu", direction = 1, 
                        limits = c(min(low_maternal$maternal), max(high_maternal$maternal))) +
@@ -100,7 +114,7 @@ low <- ggplot(low_maternal) +
   guides(fill="none") + 
   ggtitle("Lowest")
 
-high <- ggplot(high_maternal) +
+maternal_high <- ggplot(high_maternal) +
   geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
   scale_fill_distiller(palette = "RdPu", direction = 1,
                        limits = c(min(low_maternal$maternal), max(high_maternal$maternal))) +
@@ -112,7 +126,7 @@ high <- ggplot(high_maternal) +
   guides(fill="none") +
   ggtitle("Highest")
 
-low + high + plot_annotation(
+maternal_low + maternal_high + plot_annotation(
   title = 'Highest and Lowest Maternal Mortality Rates',
   subtitle = 'The 10 countries with the lowest and highest maternal mortality rates, respectively.',
   caption = 'Note: The x-axis scales are not the same between the two figures.'
@@ -128,7 +142,7 @@ low_haq <- global %>%
 ```
 
 ```{r}
-low <- ggplot(low_haq) +
+haq_low <- ggplot(low_haq) +
   geom_col(aes(haq, reorder(country, haq), fill = haq)) +
   scale_fill_distiller(palette = "RdPu", direction = 1, 
                        limits = c(min(low_haq$haq), max(high_haq$haq))) +
@@ -140,7 +154,7 @@ low <- ggplot(low_haq) +
   guides(fill="none") + 
   ggtitle("Lowest")
 
-high <- ggplot(high_haq) +
+haq_high <- ggplot(high_haq) +
   geom_col(aes(haq, reorder(country, haq), fill = haq)) +
   scale_fill_distiller(palette = "RdPu", direction = 1,
                        limits = c(min(low_haq$haq), max(high_haq$haq))) +
@@ -152,11 +166,12 @@ high <- ggplot(high_haq) +
   guides(fill="none") +
   ggtitle("Highest")
 
-high + low + plot_annotation(
+haq_high + haq_low + plot_annotation(
   title = 'Highest and Lowest Heathcare Access and Quality (HAQ) Indexes',
   subtitle = 'The 10 countries with the lowest and highest HAQ indexes, respectively.',
   caption = 'Note: The x-axis scales are not the same between the two figures.'
 )
 ```
+
 
 
