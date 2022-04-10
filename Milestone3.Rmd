@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(readr)
 library(tidyverse)
 library(patchwork)
@@ -17,34 +17,53 @@ library(patchwork)
 ```{r}
 mortality <- read_csv("global_mortality.csv") %>%
   filter(year == 2015) %>%
-  select(c(country, `Neonatal deaths (%)`, `Maternal deaths (%)`)) %>%
+  mutate(maternal = `Maternal deaths (%)`,
+         neonatal = `Neonatal deaths (%)`,
+         `Maternal deaths (%)` = NULL,
+         `Neonatal deaths (%)` = NULL) %>%
+  select(c(country, maternal, neonatal)) %>%
   drop_na()
   
 haq <- read_csv("haq_index.csv") %>%
-  filter(Year == 2015)
+  filter(Year == 2015) %>%
+  mutate(country = Entity,
+         haq = `HAQ Index (IHME (2017))`,
+         Entity = NULL,
+         `HAQ Index (IHME (2017))` = NULL) %>%
+  select(c(country, haq))
 
-countries <- intersect(mortality$country, haq$Entity)
+countries <- intersect(mortality$country, haq$country)
 mortality <- mortality %>%
   filter(country %in% countries)
 haq <- haq %>%
-  filter(Entity %in% countries)
+  filter(country %in% countries)
+
+global <- inner_join(mortality, haq)
 ```
 
-```{r fig.height = 24, fig.width = 12}
-countries1 <- ggplot(mortality) +
-  geom_col(aes(`Neonatal deaths (%)`, reorder(country, `Neonatal deaths (%)`), fill = country)) +
+```{r fig.height = 24, fig.width = 18}
+neonatal <- ggplot(global) +
+  geom_col(aes(neonatal, reorder(country, neonatal), fill = country)) +
   ylab(label = "") +
   theme(axis.text = element_text(size = 2)) +
   theme_minimal() + 
   guides(fill="none")
 
-countries2 <- ggplot(mortality) + 
-  geom_col(aes(`Maternal deaths (%)`, reorder(country, `Maternal deaths (%)`), fill = country)) +
+maternal <- ggplot(global) + 
+  geom_col(aes(maternal, reorder(country, maternal), fill = country)) +
   ylab(label = "") +
   theme(axis.text = element_text(size = 2)) +
   theme_minimal() + 
   guides(fill="none")
 
-countries1 + countries2
+haq <- ggplot(global) + 
+  geom_col(aes(haq, reorder(country, -haq), fill = country)) +
+  ylab(label = "") +
+  theme(axis.text = element_text(size = 2)) +
+  theme_minimal() + 
+  guides(fill="none")
+
+neonatal + maternal + haq
 ```
+
 
