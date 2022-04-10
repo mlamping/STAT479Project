@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 library(readr)
 library(tidyverse)
 library(patchwork)
@@ -20,7 +20,9 @@ library(spData)
 library(sf)
 ```
 
-# Maternal and Fetal Heath Factors and Outcomes
+# What Influences the Decision to Have or Not Have Children?
+
+## A Global Context
 
 ```{r}
 mortality <- read_csv("global_mortality.csv") %>%
@@ -60,54 +62,61 @@ locs <- as.data.frame(centroids) %>%
 locs$country[236] = "United States"
 
 global <- inner_join(global_, locs) %>%
-  drop_na()
-```
-
-```{r fig.height = 24, fig.width = 18}
-neonatal <- ggplot(global) +
-  geom_col(aes(neonatal, reorder(country, neonatal), fill = country)) +
-  ylab(label = "") +
-  theme(axis.text = element_text(size = 2)) +
-  theme_minimal() + 
-  guides(fill="none")
-
-maternal <- ggplot(global) + 
-  geom_col(aes(maternal, reorder(country, maternal), fill = country)) +
-  ylab(label = "") +
-  theme(axis.text = element_text(size = 2)) +
-  theme_minimal() + 
-  guides(fill="none")
-
-haq <- ggplot(global) + 
-  geom_col(aes(haq, reorder(country, -haq), fill = country)) +
-  ylab(label = "") +
-  theme(axis.text = element_text(size = 2)) +
-  theme_minimal() + 
-  guides(fill="none")
-
-#neonatal + maternal + haq
-```
-
-```{r fig.height = 15, fig.width = 20}
-world_map <- world %>%
-  filter(continent != "Antarctica")
-
-global <- global %>%
+  drop_na() %>%
   mutate(avg_mortality = rowMeans(select(., c(maternal, neonatal)), na.rm = TRUE))
 
-p1 <- ggplot() +
+world_map <- world %>%
+  filter(continent != "Antarctica")
+```
+
+```{r fig.height = 8, fig.width = 15}
+# map plot
+ggplot() +
   geom_sf(data = world_map, fill = "white") +
-  geom_point(data = global, aes(x, y, size = haq, col = maternal)) +
+  geom_point(data = global, aes(x, y, size = maternal, col = haq)) +
   scale_color_distiller(palette = "RdPu", direction = 1) +
   theme_void()
+```
 
-p2 <- ggplot() +
-  geom_sf(data = world_map, fill = "white") +
-  geom_point(data = global, aes(x, y, size = haq, col = neonatal)) +
-  scale_color_distiller(palette = "YlOrBr", direction = 1) +
-  theme_void()
+```{r}
+high_maternal <- global %>%
+  top_n(n = 10, wt = maternal)
 
-p1 / p2 + plot_layout(guides = "collect")
+low_maternal <- global %>%
+  top_n(n = -10, wt = maternal)
+```
+
+
+```{r}
+low <- ggplot(low_maternal) +
+  geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, 
+                       limits = c(min(low_maternal$maternal), max(high_maternal$maternal))) +
+  ylab(label = "") +
+  theme_minimal() + 
+  theme(axis.text = element_text(size = 10),
+        axis.title.x=element_blank(),
+        panel.grid.major.y = element_blank()) +
+  guides(fill="none") + 
+  ggtitle("Lowest")
+
+high <- ggplot(high_maternal) +
+  geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1,
+                       limits = c(min(low_maternal$maternal), max(high_maternal$maternal))) +
+  ylab(label = "") +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 10),
+        axis.title.x=element_blank(),
+        panel.grid.major.y = element_blank()) +
+  guides(fill="none") +
+  ggtitle("Highest")
+
+low + high + plot_annotation(
+  title = 'Highest and Lowest Maternal Mortality Rates',
+  subtitle = 'The 10 countries with the lowest and highest maternal mortality rates, respectively.',
+  caption = 'Note: The x-axis scales are not the same between the two figures.'
+)
 ```
 
 
