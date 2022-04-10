@@ -119,4 +119,44 @@ low + high + plot_annotation(
 )
 ```
 
+```{r}
+high_haq <- global %>%
+  top_n(n = 10, wt = haq)
+
+low_haq <- global %>%
+  top_n(n = -10, wt = haq)
+```
+
+```{r}
+low <- ggplot(low_haq) +
+  geom_col(aes(haq, reorder(country, haq), fill = haq)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, 
+                       limits = c(min(low_haq$haq), max(high_haq$haq))) +
+  ylab(label = "") +
+  theme_minimal() + 
+  theme(axis.text = element_text(size = 10),
+        axis.title.x=element_blank(),
+        panel.grid.major.y = element_blank()) +
+  guides(fill="none") + 
+  ggtitle("Lowest")
+
+high <- ggplot(high_haq) +
+  geom_col(aes(haq, reorder(country, haq), fill = haq)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1,
+                       limits = c(min(low_haq$haq), max(high_haq$haq))) +
+  ylab(label = "") +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 10),
+        axis.title.x=element_blank(),
+        panel.grid.major.y = element_blank()) +
+  guides(fill="none") +
+  ggtitle("Highest")
+
+high + low + plot_annotation(
+  title = 'Highest and Lowest Heathcare Access and Quality (HAQ) Indexes',
+  subtitle = 'The 10 countries with the lowest and highest HAQ indexes, respectively.',
+  caption = 'Note: The x-axis scales are not the same between the two figures.'
+)
+```
+
 
