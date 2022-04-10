@@ -1,0 +1,50 @@
+---
+title: "Milestone 3"
+author: "Anisha Gondesi, Mikayla Lamping, Michaela Suski"
+date: "4/10/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+library(patchwork)
+```
+
+# Maternal and Fetal Heath Factors and Outcomes
+
+```{r}
+mortality <- read_csv("global_mortality.csv") %>%
+  filter(year == 2015) %>%
+  select(c(country, `Neonatal deaths (%)`, `Maternal deaths (%)`)) %>%
+  drop_na()
+  
+haq <- read_csv("haq_index.csv") %>%
+  filter(Year == 2015)
+
+countries <- intersect(mortality$country, haq$Entity)
+mortality <- mortality %>%
+  filter(country %in% countries)
+haq <- haq %>%
+  filter(Entity %in% countries)
+```
+
+```{r fig.height = 24, fig.width = 12}
+countries1 <- ggplot(mortality) +
+  geom_col(aes(`Neonatal deaths (%)`, reorder(country, `Neonatal deaths (%)`), fill = country)) +
+  ylab(label = "") +
+  theme(axis.text = element_text(size = 2)) +
+  theme_minimal() + 
+  guides(fill="none")
+
+countries2 <- ggplot(mortality) + 
+  geom_col(aes(`Maternal deaths (%)`, reorder(country, `Maternal deaths (%)`), fill = country)) +
+  ylab(label = "") +
+  theme(axis.text = element_text(size = 2)) +
+  theme_minimal() + 
+  guides(fill="none")
+
+countries1 + countries2
+```
+
