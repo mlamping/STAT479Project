@@ -25,7 +25,7 @@ library(ggrepel)
 
 There are many reasons why women all over the world choose not to become pregnant and have children.  Across different geographies, populations, and cultures, these reasons may be financial, social, physical or otherwise.  This report aims to help visualize the reasons why women may not want to have children or become pregnant.
 
-## A Global Context
+## Access to Quality Healthcare
 
 Though maternal health outcomes are improving by the day, huge disparity still exists in different areas of the world.  Lower- and middle-income countries do not have the same access to quality healthcare facilities or medical professionals as upper-income countries.  Maternal mortality is closely linked to these factors, as demonstrated in the following plots.
 
@@ -118,12 +118,11 @@ The relationship between HAQ Index and Maternal Mortality Rate is also shown in 
 
 ```{r}
 suppressWarnings(print(ggplot(global) +
-  geom_point(aes(haq, maternal, col = skilled_attendant), size = 0.5) +
+  geom_point(aes(haq, maternal), size = 0.5) +
   geom_text_repel(aes(haq, maternal, 
                       label = ifelse(maternal > 1.5 & haq < 55, country, ''),
                       segment.size = 0.2), 
                   size = 2, max.overlaps = 27) +
-  scale_color_distiller(palette = "RdPu", direction = 1) +
   labs(title = "Maternal Mortality Rate vs. Heathcare Access and Quality Index", 
        x = "HAQ Index", 
        y = "Maternal Mortality Rate") +
@@ -133,12 +132,11 @@ suppressWarnings(print(ggplot(global) +
 
 ```{r}
 suppressWarnings(print(ggplot(global) +
-  geom_point(aes(haq, skilled_attendant, col = maternal), size = 0.5) +
+  geom_point(aes(haq, skilled_attendant), size = 0.5) +
   geom_text_repel(aes(haq, skilled_attendant, 
                       label = ifelse(skilled_attendant < 58, country, ''),
                       segment.size = 0.2), 
                   size = 2, max.overlaps = 27) +
-  scale_color_distiller(palette = "RdPu", direction = 1) +
   labs(title = "% Births with Skilled Personnel vs. Heathcare Access and Quality Index", 
        x = "HAQ Index", 
        y = "% Births") +
@@ -182,10 +180,10 @@ skilled_low <- ggplot(low_skilled) +
         axis.title.x=element_blank(),
         panel.grid.major.y = element_blank()) +
   guides(fill="none") + 
-  ggtitle("Birth Rate with Skilled Personnel")
+  ggtitle("% Births with Skilled Personnel")
 
 maternal_high + skilled_low + plot_annotation(
-  title = 'Maternal Mortality and Birth Attendant Skill',
+  title = 'Maternal Mortality and Access Birth Attendant Skill',
   subtitle = 'The countries with the highest maternal mortality and lowest skilled attendant rates, respectively.',
   caption = "Note: Darker tones indicate worse rates."
 )
@@ -335,8 +333,14 @@ ggplot(health, aes(x = employ, y = extent)) +
   theme_minimal()
 ```
 
-There are a few notable observations about factors that influence an individual’s decision to not have a child. The first is that African Americans and Caucasians/White populations as well as students and those who are employed believe that financial factors have a large influence. This makes sense since these populations make a large part of the US population. Students who need to pay for school and people employed making an average salary also need to consider finances. Moreover, all groups felt that societal opinions have a large influence. When looking at outside influences, Indians believe factors like societal pressure and traditions are significant. This was notable since the Indian culture is known to typically follow tradition. Furthermore, students also believed that these outside influences play a large role. This is an indication of the generational difference in caring what others think. Finally, with health risks, students and those who are employed felt that health risks are a large influence. This makes sense since students are young and care about living a long, healthy life and those who are employed must focus on health insurance from employers. Moreover, African Americans most strongly believe that health risks have a large influence. This was expected given the medical history of African Americans being discriminated against in hospitals. 
+There are a few notable observations about factors that influence an individual’s decision to not have a child. The first is that African Americans and Caucasian/White populations as well as students and those who are employed believe that financial factors have a large influence. This makes sense since these populations make a large part of the US population. Students who need to pay for school and people employed making an average salary also need to consider finances. Moreover, all groups felt that societal opinions have a large influence. When looking at outside influences, Indians believe factors like societal pressure and traditions are significant, a group that typically follows tradition. Furthermore, students also believed that these outside influences play a large role. This is an indication of the generational difference in caring what others think. Finally, with health risks, students and those who are employed felt that health risks are a large influence. This makes sense since students are young and care about living a long, healthy life and those who are employed must focus on health insurance from employers. Moreover, African Americans most strongly believe that health risks have a large influence. This is expected given the medical history of African Americans being discriminated against in hospitals. 
 
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
 
 ## Health Risks Associated with Pregnancy
 
@@ -363,9 +367,11 @@ cor(mat)
 ```
 
 
-Since we are exploring what may influence maternal risk levels, we choose the three factors with the strongest relationships with risk as indicated by the correlation matrix:blood sugar, systolic and diastolic blood pressure, and age. We explore each of these relationships below.
+Since we are exploring what may influence maternal risk levels, we choose the three factors with the strongest relationships with risk as indicated by the correlation matrix: blood sugar, systolic and diastolic blood pressure, and age. We explore each of these relationships below.
 
 To examine blood sugar values associated with the three levels of risk, we create a box plot.
+
+\bigskip
 
 ```{r fig.height = 3.5, fig.width = 6}
 blood_sugar <- maternal_risk %>%
@@ -426,7 +432,7 @@ It is important to consider how age might correlate with the other factors recor
 
 ## Improvements and Feedback
 
-Some improvements that we plan on making for our final draft would be to make our whole report more cohesive and adding more to our analysis. While we tried to make our graphs similar by using similar color themes, we feel that we could do a little more to make them connect better, which helps with the overall theme of the report as well as making the visualizations more cohesively pleasing. We also want to improve our analysis and work on connecting the three datasets a little more. 
+Some improvements that we plan on making for our final draft would be to make our whole report more cohesive and adding more to our analysis. While we tried to make our graphs related via similar color themes, we feel that we could do a little more to make them connect better, which helps with the overall theme of the report as well as making the visualizations more aesthetically pleasing. We also want to improve our analysis and work on connecting the three main sections a bit more. 
 
 The specific feedback that we would like for our project is ways in which to improve the cohesiveness of our paper and thoughts on how our overall question/topic is being addressed. We would appreciate any overall thoughts as well on how to improve our project, whether they be specific to the visualizations or about our topic as a whole. 
 
