@@ -436,3 +436,24 @@ It is important to consider how age might correlate with the other factors recor
 Some improvements that we plan on making for our final draft would be to make our whole report more cohesive and adding more to our analysis. While we tried to make our graphs similar by using similar color themes, we feel that we could do a little more to make them connect better, which helps with the overall theme of the report as well as making the visualizations more cohesively pleasing. We also want to improve our analysis and work on connecting the three datasets a little more. 
 
 The specific feedback that we would like for our project is ways in which to improve the cohesiveness of our paper and thoughts on how our overall question/topic is being addressed. We would appreciate any overall thoughts as well on how to improve our project, whether they be specific to the visualizations or about our topic as a whole. 
+
+
+## References
+
+Mock, Thomas. (2018). Global Mortality. Retrieved March 13, 2022 from 
+https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-04-16.
+
+Our World in Data. (2015). Healthcare Access and Quality Index. Retrieved April 10, 2022 from
+https://ourworldindata.org/grapher/healthcare-access-and-quality-index. 
+
+RKKaggle. (2021). Survey on Maternity(NJ, USA). Retrieved April 10, 2022 from
+https://www.kaggle.com/datasets/rkkaggle2/social-attitudes-regarding-childlessness-nj-survey?sel
+ect=ChildlessnessQuestions.csv
+
+Safrit, Catherine. (2021, December). Maternal Health Risk Data. Retrieved February 
+12, 2022 from https://www.kaggle.com/csafrit2/maternal-health-risk-data.
+
+Zeus. (2021). World Health Statistics 2020 | Complete | Geo-Analysis. Retrieved April 10, 2022 
+from https://www.kaggle.com/datasets/utkarshxy/who-worldhealth-statistics-2020-complete?select=birthAttendedBySkilledPersonal.csv. 
+
+
