@@ -176,17 +176,17 @@ haq_high + haq_low + plot_annotation(
 
 ## Social Attitudes Towards not Having Children
 
-```{r, include = FALSE}
+```{r}
 nj <- read_csv("njsurvey.csv")
 q <- read_csv("questions.csv")
 ```
 
-```{r, include = FALSE}
+```{r}
 nj <- nj %>%
   subset(Gender != "Male")
 ```
 
-```{r, include = FALSE}
+```{r}
 nj <- subset (nj, select = -Q7) %>%
   rename(employ = "Employment Status")
 ```
@@ -196,7 +196,7 @@ nj <- subset (nj, select = -Q7) %>%
 The following graphs visualize data from surveys taken in an attempt to track societal attitudes towards having children. The survey data included demographic information about the respondents as well as the extent to which they agreed to various statements regarding societal attitudes towards having children. We split the questions up by the category of questions-Financial Factors, Societal Opinions, Outside Influences, and Health Factors. We also visualized the survey answers by distinguishing between both Race and Employment Status. A few things to note about these survey results is that the survey respondents are all women, between the ages of 17 and 63. They are all from New Jersey and there are a mix of women who are single and/or married as well as women with or without children. This indicates that there is a good mix of representation from a lot of different groups of women in these survey results. 
 
 
-```{r, fig.width = 15, echo = FALSE}
+```{r, fig.width = 15}
 financial <- nj %>%
   subset(select = -c(Q8:Q30)) %>%
   rename(race = "Race/Ethnicity")
@@ -212,7 +212,8 @@ ggplot(financial, aes(x = race, y = extent)) +
   labs(title = "Financial Factors", subtitle = "To what extent do you agree that the following reasons influence the decision to not have a baby?") +
   xlab("Race") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons to Not have a Baby", labels = c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons to Not have a Baby", labels = c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")) +
+  theme_minimal()
 
 
 
@@ -221,7 +222,8 @@ ggplot(financial, aes(x = employ, y = extent)) +
   labs(title = "Financial Factors", subtitle = "To what extent do you agree that the following reasons influence the decision to not have a baby?") +
   xlab("Employment Status") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons to Not have a Baby", labels = c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons to Not have a Baby", labels = c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")) +
+  theme_minimal()
 
 ```
 
@@ -234,7 +236,7 @@ From this first set of graphs, we can see that women who are African American an
 
 
 
-```{r, fig.width=15, echo = FALSE}
+```{r, fig.width=15}
 society <- nj %>%
   subset(select = -c(Q1:Q6, Q13:Q30)) %>%
   rename(race = "Race/Ethnicity")
@@ -250,14 +252,16 @@ ggplot(society, aes(x = race, y = extent)) +
   labs(title = "Societal Opinions", subtitle = "To what extent do you agree that the statements are impacting factors on the decision to not have children?") +
   xlab("Race") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Statements Regarding Societal Opinions", labels = c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish"))
+  scale_fill_brewer(palette = "Set3", name = "Statements Regarding Societal Opinions", labels = c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")) +
+  theme_minimal()
 
 ggplot(society, aes(x = employ, y = extent)) +
   geom_bar(aes(fill = question),stat = "identity",position = "dodge") +
   labs(title = "Societal Opinions", subtitle = "To what extent do you agree that the statements are impacting factors on the decision to not have children?") +
   xlab("Employment Status") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Statements Regarding Societal Opinions", labels = c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish"))
+  scale_fill_brewer(palette = "Set3", name = "Statements Regarding Societal Opinions", labels = c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")) +
+  theme_minimal()
 
 ```
 
@@ -265,7 +269,7 @@ ggplot(society, aes(x = employ, y = extent)) +
 From this set of graphs, we can see that majority of people believe that society's opinion that woman should have children and the differences in the way women and men are perceived when choosing not to have a child plays a large role in an individual's decision to not have a child. On the contrary, whether or not it is reasonable to have a child and society's negative opinions on women who choose to have a child are both seen as statements that do not have a large impact on an individual's choice to have a child. 
 
 
-```{r, fig.width = 15, echo = FALSE}
+```{r, fig.width = 15}
 outinfluences <- nj %>%
   subset(select = -c(Q1:Q12, Q21:Q30)) %>%
   rename(race = "Race/Ethnicity")
@@ -281,14 +285,16 @@ ggplot(outinfluences, aes(x = race, y = extent)) +
   labs(title = "Outside Influences", subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?") +
   xlab("Race") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons for Choosing not to have a Child", labels = c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children","Traditional Views that a Woman's duty is to have a Child"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons for Choosing not to have a Child", labels = c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")) +
+  theme_minimal()
 
 ggplot(outinfluences, aes(x = employ, y = extent)) +
   geom_bar(aes(fill = question),stat = "identity",position = "dodge") +
   labs(title = "Outside Influences", subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?") +
   xlab("Employment Status") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons for Choosing not to have a Child", labels = c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children","Traditional Views that a Woman's duty is to have a Child"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons for Choosing not to have a Child", labels = c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")) +
+  theme_minimal()
 ```
 
 
@@ -299,7 +305,7 @@ Two interesting observations from these graphs regarding outside influences such
 
 
 
-```{r, fig.width=15, echo = FALSE}
+```{r, fig.width=15}
 health <- nj %>%
   subset(select = -c(Q1:Q20)) %>%
   rename(race = "Race/Ethnicity")
@@ -315,14 +321,16 @@ ggplot(health, aes(x = race, y = extent)) +
   labs(title = "Health Factors", subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?") +
   xlab("Race") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons for Choosing not to have a Child", labels = c("Middle Aged Woman is Probably Infertile", "Middle Aged Woman will face Health Complications", "women without Children live longer than those who do", "Woman should be Physically Fit before having Children", "Pregnancy can Cause High blood pressure, depression or anxiety", "Health Risks outweigh Benefits", "Young Woman Shouldn't have Health Concerns","Women Should not consider Health Risks when Choosing to Have a Child", "Pregnancy after the Age of 30 has lots of Risks", "Biologically, it's too late to have a child after mid-thirties"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons for Choosing not to have a Child", labels = c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")) +
+  theme_minimal()
 
 ggplot(health, aes(x = employ, y = extent)) +
   geom_bar(aes(fill = question),stat = "identity",position = "dodge") +
   labs(title = "Health Factors", subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?") +
   xlab("Employment Status") +
   ylab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
-  scale_fill_discrete(name = "Reasons for Choosing not to have a Child", labels = c("Middle Aged Woman is Probably Infertile", "Middle Aged Woman will face Health Complications", "women without Children live longer than those who do", "Woman should be Physically Fit before having Children", "Pregnancy can Cause High blood pressure, depression or anxiety", "Health Risks outweigh Benefits", "Young Woman Shouldn't have Health Concerns","Women Should not consider Health Risks when Choosing to Have a Child", "Pregnancy after the Age of 30 has lots of Risks", "Biologically, it's too late to have a child after mid-thirties"))
+  scale_fill_brewer(palette = "Set3", name = "Reasons for Choosing not to have a Child", labels = c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")) +
+  theme_minimal()
 ```
 
 From these graphs, we can see that the groups that believe that health risk factors play a large role in the decision to not have a child are African Americans, students, and those who are employed. 
@@ -332,9 +340,9 @@ Overall, there are a few notable observations and conclusions that can be made f
 The overarching conclusion made from these visualizations and observations is that there are so many societal factors that play a role in a person's decision on whether or not they should have a child and it is important to consider these factors when analyzing pregnancies and births. 
 
 
-# What influences maternal risk levels?
+## Health Risks Associated with Pregnancy
 
-```{r, include = FALSE}
+```{r}
 maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
 
 # update risk factor levels
@@ -345,9 +353,8 @@ maternal_risk <- maternal_risk %>%
 ```
 
 
-INTRODUCTION HERE?
-
 We examine how each factor is correlated in the matrix below.
+
 ```{r}
 mat <- maternal_risk %>%
   mutate(RiskLevel = case_when(RiskLevel == "low risk" ~ 0,
@@ -357,43 +364,63 @@ mat <- maternal_risk %>%
 cor(mat)
 ```
 
+
 Since we are exploring what may influence maternal risk levels, we choose the three factors with the strongest relationships with risk as indicated by the correlation matrix:blood sugar, systolic and diastolic blood pressure, and age. We explore each of these relationships below.
 
 To examine blood sugar values associated with the three levels of risk, we create a box plot.
-```{r}
+
+```{r fig.height = 3.5, fig.width = 6}
 blood_sugar <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(BS, RiskLevel, col = RiskLevel)) +
-  labs(title = "Blood Sugar Levels vs. Pregnancy Risk", x = "Blood Sugar")
+  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
+  labs(title = "Blood Sugar Levels vs. Pregnancy Risk", x = "Blood Sugar") +
+  theme_minimal()
 
 blood_sugar
 ```
+
+\bigskip
 
 It is clear that higher blood sugar levels are correlated with higher pregnancy risk levels, as the high risk box plot has a much larger average and variance. This does not necessarily indicate cause, but does confirm the relatively large correlation value between blood sugar and risk level (0.47329943) seen in the correlation matrix.
 
 
 Next, we examine blood pressure (both Systolic and Diastolic) and risk.
-```{r}
+
+\bigskip
+
+```{r fig.height = 3.5, fig.width = 6}
 blood_pressure <- maternal_risk %>%
   ggplot() +
   geom_point(aes(DiastolicBP, SystolicBP, col = RiskLevel)) +
+  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
   labs(title = "Systolic Blood Pressure vs. Diastolic Blood Pressure", subtitle = "Faceted by Risk Level") +
-  facet_wrap(~ RiskLevel) 
+  facet_wrap(~ RiskLevel) +
+  theme_minimal()
 
 blood_pressure
 ```
 
+\bigskip
+
 It is again clear that high values of these indicators correlates with increased pregnancy risk, though this correlation appears to be slightly weaker than blood sugar. This also confirms the direct relationship between Systolic and Diastolic blood pressure levels predicted in the correlation matrix (0.78719835).
 
 Finally, we examine age.
-```{r}
+
+\bigskip
+
+```{r fig.height = 3.5, fig.width = 6}
 age <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(Age, RiskLevel, col = RiskLevel)) +
-  labs(title = "Age vs. Pregnancy Risk Level")
+  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
+  labs(title = "Age vs. Pregnancy Risk Level") +
+  theme_minimal()
 
 age
 ```
+
+\bigskip
 
 Age appears to be directly correlated with risk level. This is expected, as it is commonly assumed that older mothers are likely to have riskier pregnancies. There are some major outliers, however, that indicate that age is not the sole cause of increased risk. For example, there are several mothers over the age of 60 who are still classified as low risk. 
 
