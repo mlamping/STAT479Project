@@ -331,3 +331,71 @@ Overall, there are a few notable observations and conclusions that can be made f
 
 The overarching conclusion made from these visualizations and observations is that there are so many societal factors that play a role in a person's decision on whether or not they should have a child and it is important to consider these factors when analyzing pregnancies and births. 
 
+
+# What influences maternal risk levels?
+
+```{r, include = FALSE}
+maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv")
+
+# update risk factor levels
+risks <- (c("low risk", "mid risk", "high risk"))
+maternal_risk <- maternal_risk %>%
+  mutate(RiskLevel = factor(RiskLevel, levels = risks)) %>%
+  filter(HeartRate > 10) # remove outlier with HeartRate of 7
+```
+
+
+INTRODUCTION HERE?
+
+We examine how each factor is correlated in the matrix below.
+```{r}
+mat <- maternal_risk %>%
+  mutate(RiskLevel = case_when(RiskLevel == "low risk" ~ 0,
+                          RiskLevel == "mid risk" ~ 0.5,
+                          RiskLevel == "high risk" ~ 1))
+
+cor(mat)
+```
+
+Since we are exploring what may influence maternal risk levels, we choose the three factors with the strongest relationships with risk as indicated by the correlation matrix:blood sugar, systolic and diastolic blood pressure, and age. We explore each of these relationships below.
+
+To examine blood sugar values associated with the three levels of risk, we create a box plot.
+```{r}
+blood_sugar <- maternal_risk %>%
+  ggplot() +
+  geom_boxplot(aes(BS, RiskLevel, col = RiskLevel)) +
+  labs(title = "Blood Sugar Levels vs. Pregnancy Risk", x = "Blood Sugar")
+
+blood_sugar
+```
+
+It is clear that higher blood sugar levels are correlated with higher pregnancy risk levels, as the high risk box plot has a much larger average and variance. This does not necessarily indicate cause, but does confirm the relatively large correlation value between blood sugar and risk level (0.47329943) seen in the correlation matrix.
+
+
+Next, we examine blood pressure (both Systolic and Diastolic) and risk.
+```{r}
+blood_pressure <- maternal_risk %>%
+  ggplot() +
+  geom_point(aes(DiastolicBP, SystolicBP, col = RiskLevel)) +
+  labs(title = "Systolic Blood Pressure vs. Diastolic Blood Pressure", subtitle = "Faceted by Risk Level") +
+  facet_wrap(~ RiskLevel) 
+
+blood_pressure
+```
+
+It is again clear that high values of these indicators correlates with increased pregnancy risk, though this correlation appears to be slightly weaker than blood sugar. This also confirms the direct relationship between Systolic and Diastolic blood pressure levels predicted in the correlation matrix (0.78719835).
+
+Finally, we examine age.
+```{r}
+age <- maternal_risk %>%
+  ggplot() +
+  geom_boxplot(aes(Age, RiskLevel, col = RiskLevel)) +
+  labs(title = "Age vs. Pregnancy Risk Level")
+
+age
+```
+
+Age appears to be directly correlated with risk level. This is expected, as it is commonly assumed that older mothers are likely to have riskier pregnancies. There are some major outliers, however, that indicate that age is not the sole cause of increased risk. For example, there are several mothers over the age of 60 who are still classified as low risk. 
+
+It is important to consider how age might correlate with the other factors recorded in this data set, as it likely influences the other factors. In the above correlation matrix, age is positively correlated with every factor except body temperature, which we previously found to be of little influence on risk. Thus, age on its own may not be a cause of higher-risk pregnancies, but rather an older age is often linked with high values of other factors (blood sugar, blood pressure, etc.) that do increase maternal risk.
+
