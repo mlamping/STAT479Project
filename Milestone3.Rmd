@@ -211,7 +211,7 @@ nj <- subset (nj, select = -Q7) %>%
 
 ### The Survey Data
 
-The following graphs visualize data from surveys taken in an attempt to track societal attitudes towards having children. The survey data included demographic information about the respondents as well as the extent to which they agreed to various statements regarding societal attitudes towards having children. We split the questions up by the category of questions-Financial Factors, Societal Opinions, Outside Influences, and Health Factors. We also visualized the survey answers by distinguishing between both Race and Employment Status. A few things to note about these survey results is that the survey respondents are all women, between the ages of 17 and 63. They are all from New Jersey and there are a mix of women who are single and/or married as well as women with or without children. This indicates that there is a good mix of representation from a lot of different groups of women in these survey results. 
+The following graphs visualize data from surveys to track societal attitudes towards having children. The survey data included the extent to which they agreed to various statements regarding societal attitudes towards having children. 
 
 ```{r, fig.width = 15}
 financial <- nj %>%
@@ -245,7 +245,6 @@ ggplot(financial, aes(x = employ, y = extent)) +
 ```
 
 
-From this first set of graphs, we can see that women who are African American and Caucasian/White most strongly believe that not being in a strong and/or stable financial situation is a large influence on whether women decide to have a child. We can also see that women who are employed or are students most strongly believe that not being in a strong and/or stable financial situation influences a woman's decision to not have a child. 
 
 ```{r, fig.width=15}
 society <- nj %>%
@@ -277,7 +276,6 @@ ggplot(society, aes(x = employ, y = extent)) +
 ```
 
 
-From this set of graphs, we can see that majority of people believe that society's opinion that woman should have children and the differences in the way women and men are perceived when choosing not to have a child plays a large role in an individual's decision to not have a child. On the contrary, whether or not it is reasonable to have a child and society's negative opinions on women who choose to have a child are both seen as statements that do not have a large impact on an individual's choice to have a child. 
 
 ```{r, fig.width = 15}
 outinfluences <- nj %>%
@@ -308,7 +306,6 @@ ggplot(outinfluences, aes(x = employ, y = extent)) +
 ```
 
 
-Two interesting observations from these graphs regarding outside influences such as family, religion, past stories and societal pressures are that Indians believe that social perceptions and traditions play a large role in an individual's decision to not have a child and that students believe that all mentioned outside influences play a large role in an individual's decision to not have a child. 
 
 ```{r, fig.width=15}
 health <- nj %>%
@@ -338,11 +335,7 @@ ggplot(health, aes(x = employ, y = extent)) +
   theme_minimal()
 ```
 
-From these graphs, we can see that the groups that believe that health risk factors play a large role in the decision to not have a child are African Americans, students, and those who are employed. 
-
-Overall, there are a few notable observations and conclusions that can be made from these visualizations. The first is that African Americans and Caucasians/White populations as well as students and those who are employed believe that financial factors have a large influence on an individual's decision to not have a child. This makes sense since African Americans and Caucasians/White populations make a large part of the US population and for students who are possible in debt or those who are employed and making an average salary, finances are a large factor in deciding whether or not to have children. Another interesting observation was that all groups felt that societal opinions played a large role in people's decisions to have a child. These opinions included the traditional view that it is a woman's duty to have a child and the differences in perceptions between males and females when it comes to choosing not to have a child. When looking at outside influences, I found that Indians find that outside influences like societal pressure and traditions play a large role in decision making with having a child. This was notable since the Indian culture is known to typically follow tradition quite a bit as well as focus a lot on opinions of others. Another observation was that students also believed that these outside influences play a large role in decision making when it comes to having a child. This is also a good example of the differences in caring about opinions between younger people and older people. Finally, with health risks, students and those who are employed felt that health risks are a large influence. This makes sense since students are young and care about living a long, healthy life and those who are employed have to focus on health insurance through their employers. Another observation regarding health risks is that African Americans most strongly believe that health risks influence an individual's decision to have a child. This was something that was also expected since historically, African Americans are treated differently than people of other races in hospitals and typically face more health complications due to the health care system's negligence of care for African Americans. 
-
-The overarching conclusion made from these visualizations and observations is that there are so many societal factors that play a role in a person's decision on whether or not they should have a child and it is important to consider these factors when analyzing pregnancies and births. 
+There are a few notable observations about factors that influence an individual’s decision to not have a child. The first is that African Americans and Caucasians/White populations as well as students and those who are employed believe that financial factors have a large influence. This makes sense since these populations make a large part of the US population. Students who need to pay for school and people employed making an average salary also need to consider finances. Moreover, all groups felt that societal opinions have a large influence. When looking at outside influences, Indians believe factors like societal pressure and traditions are significant. This was notable since the Indian culture is known to typically follow tradition. Furthermore, students also believed that these outside influences play a large role. This is an indication of the generational difference in caring what others think. Finally, with health risks, students and those who are employed felt that health risks are a large influence. This makes sense since students are young and care about living a long, healthy life and those who are employed must focus on health insurance from employers. Moreover, African Americans most strongly believe that health risks have a large influence. This was expected given the medical history of African Americans being discriminated against in hospitals. 
 
 
 ## Health Risks Associated with Pregnancy
