@@ -110,6 +110,7 @@ ggplot() +
   scale_color_distiller(palette = "RdPu", direction = 1) +
   theme_void()
 ```
+
 \bigskip
 
 The world map shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
@@ -332,6 +333,29 @@ ggplot(health, aes(x = employ, y = extent)) +
   scale_fill_brewer(palette = "Set3", name = "Reasons for Choosing not to have a Child", labels = c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")) +
   theme_minimal()
 ```
+
+```{r}
+# outinfluences
+# society
+# financial
+
+# health
+question_nums <- unique(health$question)
+question_text <- c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")
+
+health$question_text <- plyr::mapvalues(health$question, 
+          from = question_nums, 
+          to = question_text)
+
+ggplot(health, aes(x = extent, y= question_text)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Health Factors", 
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?") +
+  xlab("On a Scale of 1-5 (1=Strongly Disagree, 5 = Strongly Agree)") +
+  ylab("Question") +
+  theme_minimal()
+```
+
 
 There are a few notable observations about factors that influence an individual’s decision to not have a child. The first is that African Americans and Caucasian/White populations as well as students and those who are employed believe that financial factors have a large influence. This makes sense since these populations make a large part of the US population. Students who need to pay for school and people employed making an average salary also need to consider finances. Moreover, all groups felt that societal opinions have a large influence. When looking at outside influences, Indians believe factors like societal pressure and traditions are significant, a group that typically follows tradition. Furthermore, students also believed that these outside influences play a large role. This is an indication of the generational difference in caring what others think. Finally, with health risks, students and those who are employed felt that health risks are a large influence. This makes sense since students are young and care about living a long, healthy life and those who are employed must focus on health insurance from employers. Moreover, African Americans most strongly believe that health risks have a large influence. This is expected given the medical history of African Americans being discriminated against in hospitals. 
 
