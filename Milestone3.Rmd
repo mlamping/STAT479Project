@@ -438,7 +438,9 @@ blood_sugar <- maternal_risk %>%
   geom_boxplot(aes(BS, RiskLevel, col = RiskLevel)) +
   scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
   labs(title = "Blood Sugar Levels vs. Pregnancy Risk", x = "Blood Sugar") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none") 
+
 
 blood_sugar
 ```
@@ -454,8 +456,9 @@ Next, we examine blood pressure (both Systolic and Diastolic) and risk.
 
 ```{r fig.height = 3.5, fig.width = 6}
 blood_pressure <- maternal_risk %>%
-  ggplot() +
-  geom_point(aes(DiastolicBP, SystolicBP, col = RiskLevel)) +
+  ggplot(aes(DiastolicBP,SystolicBP)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgray", alpha = 0.2) +
+  geom_point(aes(x=DiastolicBP, y=SystolicBP, col = RiskLevel)) +
   scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
   labs(title = "Systolic Blood Pressure vs. Diastolic Blood Pressure", subtitle = "Faceted by Risk Level") +
   facet_wrap(~ RiskLevel) +
@@ -466,7 +469,7 @@ blood_pressure
 
 \bigskip
 
-It is again clear that high values of these indicators correlates with increased pregnancy risk, though this correlation appears to be slightly weaker than blood sugar. This also confirms the direct relationship between Systolic and Diastolic blood pressure levels predicted in the correlation matrix (0.78719835).
+It is again clear that high values of these indicators correlates with increased pregnancy risk, though this correlation appears to be slightly weaker than blood sugar. This also confirms the direct relationship between Systolic and Diastolic blood pressure levels predicted in the correlation matrix, as indicated by the trend lines.
 
 Finally, we examine age.
 
@@ -478,7 +481,8 @@ age <- maternal_risk %>%
   geom_boxplot(aes(Age, RiskLevel, col = RiskLevel)) +
   scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
   labs(title = "Age vs. Pregnancy Risk Level") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 
 age
 ```
