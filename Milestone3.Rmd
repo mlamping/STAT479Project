@@ -50,38 +50,20 @@ haq <- read_csv("haq_index.csv") %>%
 ```
 
 ```{r}
-countries <- intersect(mortality$country, haq$country)
+countries_ <- intersect(mortality$country, haq$country)
 
 mortality <- mortality %>%
-  filter(country %in% countries)
+  filter(country %in% countries_)
 haq <- haq %>%
-  filter(country %in% countries)
+  filter(country %in% countries_)
 
 global_ <- inner_join(mortality, haq)
 ```
 
-```{r}
-# wmap <- getMap(resolution="high")
-# centroids <- gCentroid(wmap, byid = TRUE)
-# 
-# locs <- as.data.frame(centroids) %>%
-#   rownames_to_column("country")
-# locs$country[236] = "United States"
-
-# global <- inner_join(global_, locs) %>%
-#   drop_na() %>%
-#   mutate(avg_mortality = rowMeans(select(., c(maternal, neonatal)), na.rm = TRUE))
-
-# world_map <- world %>%
-#   filter(continent != "Antarctica")
-```
-
-\bigskip
-\bigskip
-
 ```{r fig.height = 8, fig.width = 15}
 library(maps)
-world_map <- map_data(map = "world")
+world_map <- map_data(map = "world") %>% 
+  filter(region != "Antarctica")
 
 global_$country[182] = "USA"
 global_$country[46] = "Democratic Republic of the Congo"
@@ -90,21 +72,24 @@ global_$country[40] = "Republic of Congo"
 ```
 
 ```{r fig.height = 8, fig.width = 15}
-ggplot() +
+p1 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = maternal), map = world_map) +
   geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
   labs(fill = "Maternal Mortality Rate") +
-  theme_void()
+  theme_void() 
+  #theme(legend.position = "bottom")
 ```
 
-```{r fig.height = 8, fig.width = 15}
-ggplot() +
+```{r fig.height = 12, fig.width = 15}
+p2 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = haq), map = world_map) +
   geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
   labs(fill = "HAQ Index") +
   theme_void()
+
+p1 / p2
 ```
 
 
@@ -138,17 +123,11 @@ skilled$country[183] = "Vietnam"
 ```
 
 ```{r}
-countries <- intersect(mortality$country, haq$country)
-countries <- intersect(countries, skilled$country)
+countries <- intersect(countries_, skilled$country)
 
-mortality <- mortality %>%
-  filter(country %in% countries)
-haq <- haq %>%
-  filter(country %in% countries)
 skilled <- skilled %>%
   filter(country %in% countries)
 
-global_ <- inner_join(mortality, haq)
 global <- inner_join(global_, skilled)
 ```
 
@@ -201,7 +180,7 @@ maternal_high <- ggplot(high_maternal) +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
   ylab(label = "") +
   theme_minimal() +
-  theme(axis.text = element_text(size = 10),
+  theme(axis.text = element_text(size = 4),
         axis.title.x=element_blank(),
         panel.grid.major.y = element_blank()) +
   guides(fill="none") +
@@ -212,7 +191,7 @@ skilled_low <- ggplot(low_skilled) +
   scale_fill_distiller(palette = "RdPu", direction = -1) +
   ylab(label = "") +
   theme_minimal() + 
-  theme(axis.text = element_text(size = 10),
+  theme(axis.text = element_text(size = 4),
         axis.title.x=element_blank(),
         panel.grid.major.y = element_blank()) +
   guides(fill="none") + 
