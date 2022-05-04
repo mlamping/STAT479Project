@@ -36,17 +36,85 @@ mortality <- read_csv("global_mortality.csv") %>%
          neonatal = `Neonatal deaths (%)`,
          `Maternal deaths (%)` = NULL,
          `Neonatal deaths (%)` = NULL) %>%
-  select(c(country, maternal, neonatal)) %>%
+  select(c(country, country_code, maternal, neonatal)) %>%
   drop_na()
   
 haq <- read_csv("haq_index.csv") %>%
   filter(Year == 2015) %>%
   mutate(country = Entity,
+         country_code = Code,
          haq = `HAQ Index (IHME (2017))`,
          Entity = NULL,
          `HAQ Index (IHME (2017))` = NULL) %>%
-  select(c(country, haq))
+  select(c(country,country_code, haq))
+```
 
+```{r}
+countries <- intersect(mortality$country, haq$country)
+
+mortality <- mortality %>%
+  filter(country %in% countries)
+haq <- haq %>%
+  filter(country %in% countries)
+
+global_ <- inner_join(mortality, haq)
+```
+
+```{r}
+# wmap <- getMap(resolution="high")
+# centroids <- gCentroid(wmap, byid = TRUE)
+# 
+# locs <- as.data.frame(centroids) %>%
+#   rownames_to_column("country")
+# locs$country[236] = "United States"
+
+# global <- inner_join(global_, locs) %>%
+#   drop_na() %>%
+#   mutate(avg_mortality = rowMeans(select(., c(maternal, neonatal)), na.rm = TRUE))
+
+# world_map <- world %>%
+#   filter(continent != "Antarctica")
+```
+
+\bigskip
+\bigskip
+
+```{r fig.height = 8, fig.width = 15}
+library(maps)
+world_map <- map_data(map = "world")
+
+global_$country[182] = "USA"
+global_$country[46] = "Democratic Republic of the Congo"
+global_$country[42] = "Ivory Coast"
+global_$country[40] = "Republic of Congo"
+```
+
+```{r fig.height = 8, fig.width = 15}
+ggplot() +
+  geom_map(data = global_, aes(map_id = country, fill = maternal), map = world_map) +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
+  scale_fill_distiller(palette = "RdPu", direction = 1) +
+  labs(fill = "Maternal Mortality Rate") +
+  theme_void()
+```
+
+```{r fig.height = 8, fig.width = 15}
+ggplot() +
+  geom_map(data = global_, aes(map_id = country, fill = haq), map = world_map) +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
+  scale_fill_distiller(palette = "RdPu", direction = 1) +
+  labs(fill = "HAQ Index") +
+  theme_void()
+```
+
+
+\bigskip
+
+The world map shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
+
+The relationship between HAQ Index and Maternal Mortality Rate is also shown in the following scatterplot.  Additionally, the relationship between HAQ Index and Birth Attendant Skill is also explored.  Birth Attendant Skill refers to the percentage of births that were attended by skilled medical professionals.
+
+```{r}
 skilled <- read_csv("birthAttendedBySkilledPersonal.csv") %>% 
   mutate(country = Location,
          skilled_attendant = `First Tooltip`,
@@ -81,41 +149,8 @@ skilled <- skilled %>%
   filter(country %in% countries)
 
 global_ <- inner_join(mortality, haq)
-global_ <- inner_join(global_, skilled)
+global <- inner_join(global_, skilled)
 ```
-
-```{r}
-wmap <- getMap(resolution="high")
-centroids <- gCentroid(wmap, byid = TRUE)
-
-locs <- as.data.frame(centroids) %>%
-  rownames_to_column("country")
-locs$country[236] = "United States"
-
-global <- inner_join(global_, locs) %>%
-  drop_na() %>%
-  mutate(avg_mortality = rowMeans(select(., c(maternal, neonatal)), na.rm = TRUE))
-
-world_map <- world %>%
-  filter(continent != "Antarctica")
-```
-
-\bigskip
-\bigskip
-
-```{r fig.height = 8, fig.width = 15}
-ggplot() +
-  geom_sf(data = world_map, fill = "white") +
-  geom_point(data = global, aes(x, y, size = maternal, col = haq)) +
-  scale_color_distiller(palette = "RdPu", direction = 1) +
-  theme_void()
-```
-
-\bigskip
-
-The world map shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
-
-The relationship between HAQ Index and Maternal Mortality Rate is also shown in the following scatterplot.  Additionally, the relationship between HAQ Index and Birth Attendant Skill is also explored.  Birth Attendant Skill refers to the percentage of births that were attended by skilled medical professionals.
 
 ```{r}
 suppressWarnings(print(ggplot(global) +
