@@ -148,7 +148,7 @@ health$question_text <- plyr::mapvalues(health$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(health, aes(x = extent, y= question_text)) +
+ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean))) +
   geom_violin() +
   
   labs(title = "Health Factors",
@@ -164,7 +164,7 @@ outinfluences$question_text <- plyr::mapvalues(outinfluences$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(outinfluences, aes(x = extent, y= question_text)) +
+ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean))) +
   geom_violin() +
   labs(title = "Outside Influences",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
@@ -179,7 +179,7 @@ society$question_text <- plyr::mapvalues(society$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(society, aes(x = extent, y= question_text)) +
+ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean))) +
   geom_violin() +
   labs(title = "Societal Factors",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
@@ -194,7 +194,7 @@ financial$question_text <- plyr::mapvalues(financial$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(financial, aes(x = extent, y= question_text)) +
+ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean))) +
   geom_violin() +
 
   labs(title = "Financial Factors",
