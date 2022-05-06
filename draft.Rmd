@@ -2,7 +2,9 @@
 title: "Milestone 4 Graphs"
 author: "Anisha Gondesi"
 date: "5/4/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -140,7 +142,7 @@ ggplot(employ_factors, aes(x= factor, y = extent)) +
 
 ```
 
-```{r, fig.width = 7, fig.height = 5}
+```{r, fig.width = 7, fig.height = 6}
 question_nums <- unique(health$question)
 question_text <- c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")
 
@@ -148,15 +150,28 @@ health$question_text <- plyr::mapvalues(health$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean))) +
+health <- health %>% 
+  group_by(question_text) %>% 
+  mutate(avg_extent = mean(extent))
+
+ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
-  
   labs(title = "Health Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
-  theme_minimal()
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?",
+       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+       y = element_blank(),
+       fill = "Average Rating") +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.text=element_text(size=10),
+        axis.text=element_text(size=8),
+        plot.title=element_text(size=12),
+        plot.subtitle=element_text(size=10)) 
 ```
 
-```{r, fig.width = 7, fig.height = 5}
+```{r, fig.width = 7, fig.height = 6}
 question_nums <- unique(outinfluences$question)
 question_text <- c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")
 
@@ -164,14 +179,28 @@ outinfluences$question_text <- plyr::mapvalues(outinfluences$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean))) +
+outinfluences <- outinfluences %>% 
+  group_by(question_text) %>% 
+  mutate(avg_extent = mean(extent))
+
+ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Outside Influences",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
-  theme_minimal()
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
+       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+       y = element_blank(), 
+       fill = "Average Rating") +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.text=element_text(size=10),
+        axis.text=element_text(size=8),
+        plot.title=element_text(size=12),
+        plot.subtitle=element_text(size=10))
 ```
 
-```{r, fig.width = 7, fig.height = 5}
+```{r, fig.width = 7, fig.height = 6}
 question_nums <- unique(society$question)
 question_text <- c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")
 
@@ -179,14 +208,28 @@ society$question_text <- plyr::mapvalues(society$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean))) +
+society <- society %>% 
+  group_by(question_text) %>% 
+  mutate(avg_extent = mean(extent))
+
+ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Societal Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
-  theme_minimal()
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
+       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+       y = element_blank(),
+       fill = "Average Rating") +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.text=element_text(size=10),
+        axis.text=element_text(size=8),
+        plot.title=element_text(size=12),
+        plot.subtitle=element_text(size=10)) 
 ```
 
-```{r, fig.width = 7, fig.height = 5}
+```{r, fig.width = 7, fig.height = 6}
 question_nums <- unique(financial$question)
 question_text <- c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")
 
@@ -194,11 +237,21 @@ financial$question_text <- plyr::mapvalues(financial$question,
           from = question_nums, 
           to = question_text)
 
-ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean))) +
-  geom_violin() +
+financial <- financial %>% 
+  group_by(question_text) %>% 
+  mutate(avg_extent = mean(extent))
 
+ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+  geom_violin() +
   labs(title = "Financial Factors",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
-  theme_minimal()
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        legend.text=element_text(size=10),
+        axis.text=element_text(size=8),
+        plot.title=element_text(size=12),
+        plot.subtitle=element_text(size=10)) 
 ```
 

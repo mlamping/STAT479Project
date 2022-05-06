@@ -25,10 +25,6 @@ library(ggrepel)
 
 There are many reasons why women all over the world choose not to become pregnant and have children.  Across different geographies, populations, and cultures, these reasons may be financial, social, physical or otherwise.  This report aims to help visualize the reasons why women may not want to have children or become pregnant.
 
-## Access to Quality Healthcare
-
-Though maternal health outcomes are improving by the day, huge disparity still exists in different areas of the world.  Lower- and middle-income countries do not have the same access to quality healthcare facilities or medical professionals as upper-income countries.  Maternal mortality is closely linked to these factors, as demonstrated in the following plots.
-
 ```{r}
 mortality <- read_csv("global_mortality.csv") %>%
   filter(year == 2015) %>%
@@ -94,11 +90,16 @@ p2 <- ggplot() +
 ```
 
 
-\bigskip
+## Access to Quality Healthcare
 
-The world map shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
+Though maternal health outcomes are improving by the day, huge disparity still exists in different areas of the world.  Lower- and middle-income countries do not have the same access to quality healthcare facilities or medical professionals as upper-income countries.
+
+The world maps shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
 
 The relationship between HAQ Index and Maternal Mortality Rate is also shown in the following scatterplot.  Additionally, the relationship between HAQ Index and Birth Attendant Skill is also explored.  Birth Attendant Skill refers to the percentage of births that were attended by skilled medical professionals.
+
+\bigskip
+\bigskip
 
 ```{r}
 skilled <- read_csv("birthAttendedBySkilledPersonal.csv") %>% 
@@ -124,38 +125,45 @@ skilled$country[183] = "Vietnam"
 ```
 
 ```{r}
-countries <- intersect(countries_, skilled$country)
+continents <- read_csv("countries-continents.csv") %>%
+  mutate(country = Country,
+         continent = Continent) %>%
+  select(country, continent)
+cont_countries <- intersect(countries_, continents$country)
 
-skilled <- skilled %>%
-  filter(country %in% countries)
+skilled_ <- skilled %>%
+  filter(country %in% cont_countries)
 
-global <- inner_join(global_, skilled)
+global <- inner_join(global_, skilled_)
+global <- inner_join(global, continents)
 ```
 
 ```{r fig.height = 8, fig.width = 8}
 p3 <- suppressWarnings(ggplot(global) +
-  geom_point(aes(haq, maternal), size = 0.5) +
+  geom_point(aes(haq, maternal, col = continent), size = 0.8) +
   geom_text_repel(aes(haq, maternal, 
                       label = ifelse(maternal > 1.5 & haq < 55, country, ''),
                       segment.size = 0.2), 
-                  size = 2, max.overlaps = 27) +
+                  size = 1.7, max.overlaps = 27) +
   labs(title = "Maternal Mortality Rate vs. Heathcare Access and Quality Index", 
        x = "HAQ Index", 
        y = "Maternal Mortality Rate") +
+  scale_color_brewer(palette = "Set2") +
   theme_minimal()
 )
 ```
 
 ```{r fig.height = 8, fig.width = 8}
 p4 <- suppressWarnings(ggplot(global) +
-  geom_point(aes(haq, skilled_attendant), size = 0.5) +
+  geom_point(aes(haq, skilled_attendant, col = continent), size = 0.8) +
   geom_text_repel(aes(haq, skilled_attendant, 
                       label = ifelse(skilled_attendant < 58, country, ''),
                       segment.size = 0.2), 
-                  size = 2, max.overlaps = 27) +
+                  size = 1.7, max.overlaps = 27) +
   labs(title = "% Births with Skilled Personnel vs. Heathcare Access and Quality Index", 
        x = "HAQ Index", 
        y = "% Births") +
+  scale_color_brewer(palette = "Set2") +
   theme_minimal()
 )
 
