@@ -1,0 +1,204 @@
+---
+title: "Milestone 4 Graphs"
+author: "Anisha Gondesi"
+date: "5/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(readr)
+library(tidyverse)
+nj <- read_csv("njsurvey.csv")
+q <- read_csv("questions.csv")
+
+nj <- nj %>%
+  subset(Gender != "Male")
+
+nj <- subset (nj, select = -Q7) %>%
+  rename(employ = "Employment Status")
+
+financial <- nj %>%
+  subset(select = -c(Q8:Q30)) %>%
+  rename(race = "Race/Ethnicity")
+financial <- financial %>% pivot_longer(
+    cols = starts_with("Q"),
+    names_to = "question",
+    values_to = "extent",
+    values_drop_na = TRUE
+  )
+
+society <- nj %>%
+  subset(select = -c(Q1:Q6, Q13:Q30)) %>%
+  rename(race = "Race/Ethnicity")
+society <- society %>% pivot_longer(
+    cols = starts_with("Q"),
+    names_to = "question",
+    values_to = "extent",
+    values_drop_na = TRUE
+  )
+
+outinfluences <- nj %>%
+  subset(select = -c(Q1:Q12, Q21:Q30)) %>%
+  rename(race = "Race/Ethnicity")
+outinfluences <- outinfluences %>% pivot_longer(
+    cols = starts_with("Q"),
+    names_to = "question",
+    values_to = "extent",
+    values_drop_na = TRUE
+  )
+
+health <- nj %>%
+  subset(select = -c(Q1:Q20)) %>%
+  rename(race = "Race/Ethnicity")
+health <- health %>% pivot_longer(
+    cols = starts_with("Q"),
+    names_to = "question",
+    values_to = "extent",
+    values_drop_na = TRUE
+  )
+
+
+
+```
+
+
+```{r}
+race_financial <- financial %>%
+  group_by(race) %>%
+  summarise(mean(extent))%>%
+  rename("Financial Extent" = "mean(extent)")
+
+race_society <- society %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Society Extent" = "mean(extent)")
+
+race_outinfluences <- outinfluences %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Outside Influences Extent" = "mean(extent)")
+
+race_health <- health %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Health Extent" = "mean(extent)")
+
+df_list <- list(race_financial, race_society, race_outinfluences, race_health)
+
+race_factors <- df_list %>% reduce(full_join, by='race')
+
+
+```
+
+
+```{r}
+race_factors <- pivot_longer(race_factors, cols = !race, names_to = "factor", values_to = "extent")
+```
+
+
+```{r}
+ggplot(race_factors, aes(x= factor, y = extent)) +
+  geom_bar(aes(fill = race), stat = "identity",position = "dodge")
+```
+
+```{r}
+employ_financial <- financial %>%
+  group_by(employ) %>%
+  summarise(mean(extent))%>%
+  rename("Financial Extent" = "mean(extent)")
+
+employ_society <- society %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Society Extent" = "mean(extent)")
+
+employ_outinfluences <- outinfluences %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Outside Influences Extent" = "mean(extent)")
+
+employ_health <- health %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Health Extent" = "mean(extent)")
+
+df_list <- list(employ_financial, employ_society, employ_outinfluences, employ_health)
+
+employ_factors <- df_list %>% reduce(full_join, by='employ')
+
+employ_factors <- pivot_longer(employ_factors, cols = !employ, names_to = "factor", values_to = "extent")
+
+
+ggplot(employ_factors, aes(x= factor, y = extent)) +
+  geom_bar(aes(fill = employ), stat = "identity",position = "dodge")
+
+```
+
+```{r, fig.width = 7, fig.height = 5}
+question_nums <- unique(health$question)
+question_text <- c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")
+
+health$question_text <- plyr::mapvalues(health$question, 
+          from = question_nums, 
+          to = question_text)
+
+ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean))) +
+  geom_violin() +
+  
+  labs(title = "Health Factors",
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
+  theme_minimal()
+```
+
+```{r, fig.width = 7, fig.height = 5}
+question_nums <- unique(outinfluences$question)
+question_text <- c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")
+
+outinfluences$question_text <- plyr::mapvalues(outinfluences$question, 
+          from = question_nums, 
+          to = question_text)
+
+ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean))) +
+  geom_violin() +
+  labs(title = "Outside Influences",
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
+  theme_minimal()
+```
+
+```{r, fig.width = 7, fig.height = 5}
+question_nums <- unique(society$question)
+question_text <- c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")
+
+society$question_text <- plyr::mapvalues(society$question, 
+          from = question_nums, 
+          to = question_text)
+
+ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean))) +
+  geom_violin() +
+  labs(title = "Societal Factors",
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
+  theme_minimal()
+```
+
+```{r, fig.width = 7, fig.height = 5}
+question_nums <- unique(financial$question)
+question_text <- c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")
+
+financial$question_text <- plyr::mapvalues(financial$question, 
+          from = question_nums, 
+          to = question_text)
+
+ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean))) +
+  geom_violin() +
+
+  labs(title = "Financial Factors",
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
+  theme_minimal()
+```
+
