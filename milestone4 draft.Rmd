@@ -7,6 +7,18 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+library(patchwork)
+library(tidymodels)
+library(rgeos)
+library(rworldmap)
+library(rworldxtra)
+library(tibble)
+library(ggmap)
+library(spData)
+library(sf)
+library(ggrepel)
 ```
 
 ## R Markdown
@@ -100,12 +112,14 @@ race_factors <- pivot_longer(race_factors, cols = !race, names_to = "factor", va
 ```
 
 
-```{r}
+```{r fig.height = 6, fig.width = 10}
 ggplot(race_factors, aes(x= factor, y = extent)) +
-  geom_bar(aes(fill = race), stat = "identity",position = "dodge")
+  geom_bar(aes(fill = race), stat = "identity",position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal()
 ```
 
-```{r}
+```{r fig.height = 6, fig.width = 10}
 employ_financial <- financial %>%
   group_by(employ) %>%
   summarise(mean(extent))%>%
@@ -134,7 +148,9 @@ employ_factors <- pivot_longer(employ_factors, cols = !employ, names_to = "facto
 
 
 ggplot(employ_factors, aes(x= factor, y = extent)) +
-  geom_bar(aes(fill = employ), stat = "identity",position = "dodge")
+  geom_bar(aes(fill = employ), stat = "identity",position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal()
 
 ```
 
