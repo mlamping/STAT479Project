@@ -71,25 +71,26 @@ global_$country[42] = "Ivory Coast"
 global_$country[40] = "Republic of Congo"
 ```
 
-```{r fig.height = 8, fig.width = 15}
+```{r fig.height = 10, fig.width = 12}
 p1 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = maternal), map = world_map) +
-  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'white', fill = NA, size = 0.2) +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
   labs(fill = "Maternal Mortality Rate") +
   theme_void() 
   #theme(legend.position = "bottom")
 ```
 
-```{r fig.height = 12, fig.width = 15}
+```{r fig.height = 10, fig.width = 12}
 p2 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = haq), map = world_map) +
-  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'black', fill = NA) +
+  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'white', fill = NA, size = 0.2) +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
-  labs(fill = "HAQ Index") +
+  labs(fill = "HAQ Index", 
+       caption = "*HAQ stands for Healthcare Access and Quality") +
   theme_void()
 
-p1 / p2
+(p1 / p2) + plot_annotation(title = "Maternal Mortality Rate and HAQ* Index by Country")
 ```
 
 
@@ -131,8 +132,8 @@ skilled <- skilled %>%
 global <- inner_join(global_, skilled)
 ```
 
-```{r}
-suppressWarnings(print(ggplot(global) +
+```{r fig.height = 8, fig.width = 8}
+p3 <- suppressWarnings(ggplot(global) +
   geom_point(aes(haq, maternal), size = 0.5) +
   geom_text_repel(aes(haq, maternal, 
                       label = ifelse(maternal > 1.5 & haq < 55, country, ''),
@@ -142,11 +143,11 @@ suppressWarnings(print(ggplot(global) +
        x = "HAQ Index", 
        y = "Maternal Mortality Rate") +
   theme_minimal()
-))
+)
 ```
 
-```{r}
-suppressWarnings(print(ggplot(global) +
+```{r fig.height = 8, fig.width = 8}
+p4 <- suppressWarnings(ggplot(global) +
   geom_point(aes(haq, skilled_attendant), size = 0.5) +
   geom_text_repel(aes(haq, skilled_attendant, 
                       label = ifelse(skilled_attendant < 58, country, ''),
@@ -156,7 +157,9 @@ suppressWarnings(print(ggplot(global) +
        x = "HAQ Index", 
        y = "% Births") +
   theme_minimal()
-))
+)
+
+p3 / p4
 ```
 
 Both plots show how lower quality healthcare and limited access to it is related to both factors influencing birth outcomes (% skilled attendants) as well as the outcomes themselves (maternal mortality).
@@ -175,33 +178,33 @@ low_skilled <- global %>%
 \bigskip
 
 ```{r fig.width = 8, fig.height = 5}
-maternal_high <- ggplot(high_maternal) +
-  geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
-  scale_fill_distiller(palette = "RdPu", direction = 1) +
-  ylab(label = "") +
-  theme_minimal() +
-  theme(axis.text = element_text(size = 4),
-        axis.title.x=element_blank(),
-        panel.grid.major.y = element_blank()) +
-  guides(fill="none") +
-  ggtitle("Maternal Mortality Rate")
-
-skilled_low <- ggplot(low_skilled) +
-  geom_col(aes(skilled_attendant, reorder(country, skilled_attendant), fill = skilled_attendant)) +
-  scale_fill_distiller(palette = "RdPu", direction = -1) +
-  ylab(label = "") +
-  theme_minimal() + 
-  theme(axis.text = element_text(size = 4),
-        axis.title.x=element_blank(),
-        panel.grid.major.y = element_blank()) +
-  guides(fill="none") + 
-  ggtitle("% Births with Skilled Personnel")
-
-maternal_high + skilled_low + plot_annotation(
-  title = 'Maternal Mortality and Access Birth Attendant Skill',
-  subtitle = 'The countries with the highest maternal mortality and lowest skilled attendant rates, respectively.',
-  caption = "Note: Darker tones indicate worse rates."
-)
+# maternal_high <- ggplot(high_maternal) +
+#   geom_col(aes(maternal, reorder(country, -maternal), fill = maternal)) +
+#   scale_fill_distiller(palette = "RdPu", direction = 1) +
+#   ylab(label = "") +
+#   theme_minimal() +
+#   theme(axis.text = element_text(size = 4),
+#         axis.title.x=element_blank(),
+#         panel.grid.major.y = element_blank()) +
+#   guides(fill="none") +
+#   ggtitle("Maternal Mortality Rate")
+# 
+# skilled_low <- ggplot(low_skilled) +
+#   geom_col(aes(skilled_attendant, reorder(country, skilled_attendant), fill = skilled_attendant)) +
+#   scale_fill_distiller(palette = "RdPu", direction = -1) +
+#   ylab(label = "") +
+#   theme_minimal() + 
+#   theme(axis.text = element_text(size = 4),
+#         axis.title.x=element_blank(),
+#         panel.grid.major.y = element_blank()) +
+#   guides(fill="none") + 
+#   ggtitle("% Births with Skilled Personnel")
+# 
+# maternal_high + skilled_low + plot_annotation(
+#   title = 'Maternal Mortality and Access Birth Attendant Skill',
+#   subtitle = 'The countries with the highest maternal mortality and lowest skilled attendant rates, respectively.',
+#   caption = "Note: Darker tones indicate worse rates."
+# )
 ```
 
 
