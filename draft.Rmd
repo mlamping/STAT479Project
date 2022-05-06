@@ -154,7 +154,7 @@ health <- health %>%
   group_by(question_text) %>% 
   mutate(avg_extent = mean(extent))
 
-ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p1 <- ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Health Factors",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?",
@@ -183,7 +183,7 @@ outinfluences <- outinfluences %>%
   group_by(question_text) %>% 
   mutate(avg_extent = mean(extent))
 
-ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p2 <- ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Outside Influences",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
@@ -212,7 +212,7 @@ society <- society %>%
   group_by(question_text) %>% 
   mutate(avg_extent = mean(extent))
 
-ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p3 <- ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Societal Factors",
        subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
@@ -241,10 +241,13 @@ financial <- financial %>%
   group_by(question_text) %>% 
   mutate(avg_extent = mean(extent))
 
-ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p4 <- ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Financial Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", x = "1 = Strongly Disagree, 5 = Strongly Agree", y = element_blank()) +
+       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
+       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+       y = element_blank(),
+       fill = "Average Rating") +
   scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
   theme_minimal() +
@@ -254,4 +257,9 @@ ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean), fill 
         plot.title=element_text(size=12),
         plot.subtitle=element_text(size=10)) 
 ```
+
+```{r fig.height = 24, fig.width = 28}
+(p1 + p2) / (p3 + p4) + plot_layout(guides = "collect")
+```
+
 
