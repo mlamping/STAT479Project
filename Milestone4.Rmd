@@ -24,6 +24,8 @@ library(ggrepel)
 
 There are many reasons why women all over the world choose not to become pregnant and have children.  Across different geographies, populations, and cultures, these reasons may be financial, social, physical or otherwise.  This report aims to help visualize the reasons why women may not want to have children or become pregnant.
 
+\bigskip
+
 ```{r, warning = FALSE, message = FALSE}
 mortality <- read_csv("global_mortality.csv") %>%
   filter(year == 2015) %>%
@@ -73,7 +75,6 @@ p1 <- ggplot() +
   scale_fill_distiller(palette = "RdPu", direction = 1) +
   labs(fill = "Maternal Mortality Rate") +
   theme_void() 
-  #theme(legend.position = "bottom")
 ```
 
 ```{r fig.height = 5, fig.width = 7, warning = FALSE, message = FALSE}
@@ -85,7 +86,9 @@ p2 <- ggplot() +
        caption = "*HAQ stands for Healthcare Access and Quality") +
   theme_void()
 
-(p1 / p2) + plot_annotation(title = "Maternal Mortality Rate and HAQ* Index by Country") 
+(p1 / p2) + plot_annotation(title = "Maternal Mortality Rate and HAQ* Index by Country") &
+  theme(legend.text=element_text(size=8),
+        legend.title=element_text(size=10))
 ```
 
 
@@ -94,11 +97,10 @@ p2 <- ggplot() +
 
 Though maternal health outcomes are improving by the day, huge disparity still exists in different areas of the world.  Lower- and middle-income countries do not have the same access to quality healthcare facilities or medical professionals as upper-income countries.
 
-The world maps shows how countries with lower Healthcare Access and Quality (HAQ) Indexes (represented by a lighter pink) are largely also associated with higher maternal mortality rates (represented by larger circles).  The largest circles are also the lightest pinks, whereas the dark pink circles are much less perceptible.
+There is an inverse relationship between the colors of the maps above.  This means that countries with lower Healthcare Access and Quality (HAQ) Indexes typically also have higher maternal mortality rates.  Clearly, access to and quality of healthcare is essential for healthy birth outcomes.
 
-The relationship between HAQ Index and Maternal Mortality Rate is also shown in the following scatterplot.  Additionally, the relationship between HAQ Index and Birth Attendant Skill is also explored.  Birth Attendant Skill refers to the percentage of births that were attended by skilled medical professionals.
+The relationship between HAQ Index and Maternal Mortality Rate is illustrated in the following scatterplot as well.  Additionally, the relationship between HAQ Index and Birth Attendant Skill is explored.  Birth Attendant Skill refers to the percentage of births that were attended by skilled medical professionals.
 
-\bigskip
 \bigskip
 
 ```{r, warning = FALSE, message = FALSE}
@@ -140,7 +142,7 @@ global <- inner_join(global, continents)
 
 ```{r fig.height = 8, fig.width = 8, warning = FALSE, message = FALSE}
 p3 <- suppressWarnings(ggplot(global) +
-  geom_point(aes(haq, maternal, col = continent), size = 2) +
+  geom_point(aes(haq, maternal, col = continent), size = 1.8) +
   geom_text_repel(aes(haq, maternal, 
                       label = ifelse(maternal > 1.5 & haq < 55, country, ''),
                       segment.size = 0.2), 
@@ -153,9 +155,9 @@ p3 <- suppressWarnings(ggplot(global) +
 )
 ```
 
-```{r fig.height = 7, fig.width = 10, warning = FALSE, message = FALSE}
+```{r fig.height = 10, fig.width = 10, warning = FALSE, message = FALSE}
 p4 <- suppressWarnings(ggplot(global) +
-  geom_point(aes(haq, skilled_attendant, col = continent), size = 2) +
+  geom_point(aes(haq, skilled_attendant, col = continent), size = 1.8) +
   geom_text_repel(aes(haq, skilled_attendant, 
                       label = ifelse(skilled_attendant < 58, country, ''),
                       segment.size = 0.2), 
@@ -170,14 +172,18 @@ p4 <- suppressWarnings(ggplot(global) +
 p3 / p4
 ```
 
-Both plots show how lower quality healthcare and limited access to it is related to both factors influencing birth outcomes (% skilled attendants) as well as the outcomes themselves (maternal mortality).
+\bigskip
+
+The first scatterplot confirms the relationship the maps were indicating.  The second plot shows how the opposite relationship exists between healthcare quality and the presence of skilled birth attendants.  There is a clear relationship between healthcare access/quality and both 1) factors influencing birth outcomes (% attended by skilled personnel) as well as 2) the outcomes themselves (maternal mortality).
+
+The colors and select labels also corroborate the geographical trends illustrated by the maps.  Countries in Africa and Asia (looking at the map, this is narrowed to South/Southeast Asia) tend to have lower HAQ Indexes, lower proportions of births with skilled personnel, and higher maternal mortality rates.
 
 
 ## Social Attitudes Towards not Having Children
 
 ### The Survey Data
 
-The following graphs visualize data from surveys to track societal attitudes towards having children. The survey data included the extent to which they agreed to various statements regarding societal attitudes towards having children. 
+The following graphs visualize data from surveys to track societal attitudes towards having children. The survey tracked how much women agreed with certain preconceptions about birth as well as to what extent they felt certain factors influenced the decision to have or not have children.  Respondents were women living in New Jersey.
 
 ```{r, warning = FALSE, message = FALSE}
 nj <- read_csv("njsurvey.csv")
@@ -185,9 +191,9 @@ q <- read_csv("questions.csv")
 
 nj <- nj %>%
   subset(Gender != "Male")
-
 nj <- subset (nj, select = -Q7) %>%
   rename(employ = "Employment Status")
+nj$`Race/Ethnicity`[nj$`Race/Ethnicity` %in% c("Hispanic", "South American- Brazil")] <- "Latinx"
 
 financial <- nj %>%
   subset(select = -c(Q8:Q30)) %>%
@@ -230,46 +236,51 @@ health <- health %>% pivot_longer(
   )
 ```
 
+```{r, fig.width = 7, fig.height = 6, warning = FALSE, message = FALSE}
+question_nums <- unique(society$question)[-4]
+question_text <- c("It is reasonable for a woman to not have a child", "Society has a negative perception of women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women who choose not to have a child are selfish")
 
-```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
-question_nums <- unique(health$question)
-question_text <- c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")
-
-health$question_text <- plyr::mapvalues(health$question, 
+society$question_text <- plyr::mapvalues(society$question, 
           from = question_nums, 
           to = question_text)
 
-health <- health %>% 
+society <- society %>% 
+  filter(question %in% question_nums) %>%
   group_by(question_text) %>% 
   mutate(avg_extent = mean(extent))
 
-p1 <- ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p1 <- ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
-  labs(title = "Health Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?",
-       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+  labs(title = "Societal Preconceptions Surrounding Birth",
+       subtitle = "How much do you disagree or agree with the following statements?", 
+       x = "1 = strongly disagree, 5 = strongly agree", 
        y = element_blank(),
        fill = "Average Rating") +
-  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(1, 5)) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
   theme_minimal() +
   theme(legend.position = "bottom",
-        legend.text=element_text(size=10),
+        legend.text=element_text(size=8),
+        legend.title=element_text(size=10),
         axis.text=element_text(size=8),
+        axis.title.x=element_text(size=10),
         plot.title=element_text(size=12),
-        plot.subtitle=element_text(size=10)) 
+        plot.subtitle=element_text(size=10))
 
 p1
 ```
 
 \bigskip
 
-Respondents largely disagree with stereotypical health preconceptions one might have about pregnancy and birth.
+The survey questions regarding stereotypes and perceptions about women and motherhood show how respondents feel some sense of larger, societal pressure or duty to have children. Respondents largely agreed that women were selfish for not having kids, though they simultaneously valued a woman's choice to have or not have children as "reasonable." Many complex factors influence these opinions, which are explored in the following figures.
 
+### Factors Influencing the Decision to Have/Not Have Children
 
-```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
+\bigskip
+
+```{r, fig.width = 7, fig.height = 7, warning = FALSE, message = FALSE}
 question_nums <- unique(outinfluences$question)
-question_text <- c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")
+question_text <- c("Negative stories about childbirth", "Negative messages about single-parent households", "Family/Religion", "Pressure from peers", "Fear of poor parenting skills", "Societal pressure to have children", "Societal perception that same-sex couples cannot have children", "Traditional view that it is a woman's duty to have children")
 
 outinfluences$question_text <- plyr::mapvalues(outinfluences$question, 
           from = question_nums, 
@@ -282,16 +293,18 @@ outinfluences <- outinfluences %>%
 p2 <- ggplot(outinfluences, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
   labs(title = "Outside Influences",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
-       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+       subtitle = "To what extent do these factors influence the decision to have children?", 
+       x = "1 = no influence, 5 = strong influence",  
        y = element_blank(), 
        fill = "Average Rating") +
-  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(1, 5)) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
   theme_minimal() +
   theme(legend.position = "bottom",
-        legend.text=element_text(size=10),
+        legend.text=element_text(size=8),
+        legend.title=element_text(size=10),
         axis.text=element_text(size=8),
+        axis.title.x=element_text(size=10),
         plot.title=element_text(size=12),
         plot.subtitle=element_text(size=10))
 
@@ -302,32 +315,36 @@ p2
 
 Societal pressure is a strong influence while more local, personal influences like peer pressure and negative childbirth stores are not.
 
+\bigskip
 
-```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
-question_nums <- unique(society$question)
-question_text <- c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")
+```{r, fig.width = 7, fig.height = 6, warning = FALSE, message = FALSE}
+question_nums <- unique(health$question)[1:6]
+question_text <- c("Infertility due to age", "Complications due to age", "Women without children live longer", "Being physically fit before having children", "Pregnancy can cause high blood pressure, depression, or anxiety", "Health risks outweigh benefits")
 
-society$question_text <- plyr::mapvalues(society$question, 
+health$question_text <- plyr::mapvalues(health$question, 
           from = question_nums, 
           to = question_text)
 
-society <- society %>% 
+health <- health %>% 
+  filter(question %in% question_nums) %>%
   group_by(question_text) %>% 
-  mutate(avg_extent = mean(extent))
+  mutate(avg_extent = mean(extent)) 
 
-p3 <- ggplot(society, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
+p3 <- ggplot(health, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
-  labs(title = "Societal Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
-       x = "0 = Strongly Disagree, 5 = Strongly Agree", 
+  labs(title = "Health",
+       subtitle = "To what extent do these factors influence the decision to have children?", 
+       x = "1 = no influence, 5 = strong influence", 
        y = element_blank(),
        fill = "Average Rating") +
-  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(1, 5)) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
   theme_minimal() +
   theme(legend.position = "bottom",
-        legend.text=element_text(size=10),
+        legend.text=element_text(size=8),
+        legend.title=element_text(size=10),
         axis.text=element_text(size=8),
+        axis.title.x=element_text(size=10),
         plot.title=element_text(size=12),
         plot.subtitle=element_text(size=10)) 
 
@@ -336,14 +353,13 @@ p3
 
 \bigskip
 
-Responses regarding societal preconceptions were much more polarized than other categories. Nearly all respondents thought that men and women are not treated equally when they choose not to have kids, yet respondents also largely said women were selfish for not having kids. This corroborates that the societal pressure to have children is a strong factor for many women.
+Respondents largely agreed that potential health risks were not strong influences in their decisions to have or not have children.  It is important to remember that all respondents lived in New Jersey and therefore had access to a certain quality of healthcare that is not available in all areas of the globe.
 
+\bigskip
 
-
-
-```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
-question_nums <- unique(financial$question)
-question_text <- c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")
+```{r, fig.width = 7, fig.height = 6, warning = FALSE, message = FALSE}
+question_nums <- unique(financial$question)[-3]
+question_text <- c("Financial instability", "Cost to raise a child", "Opportunity cost of parenting instead of working", "Fertility treatments/adoption costs if infertile", "No financial support from a partner/spouse")
 
 financial$question_text <- plyr::mapvalues(financial$question, 
           from = question_nums, 
@@ -355,19 +371,21 @@ financial <- financial %>%
 
 p4 <- ggplot(financial, aes(x = extent, y= reorder(question_text, extent, mean), fill = avg_extent)) +
   geom_violin() +
-  labs(title = "Financial Factors",
-       subtitle = "To what extent do the following reasons influence a woman's decision to not have a child?", 
-       x = "1 = Strongly Disagree, 5 = Strongly Agree", 
+  labs(title = "Financial",
+       subtitle = "To what extent do these factors influence the decision to have children?", 
+       x = "1 = no influence, 5 = strong influence",  
        y = element_blank(),
        fill = "Average Rating") +
-  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(0, 5)) +
+  scale_fill_distiller(palette = "RdPu", direction = 1, limits = c(1, 5)) +
   scale_y_discrete(labels = function(x) stringr::str_wrap(x, width = 30)) +
   theme_minimal() +
   theme(legend.position = "bottom",
-        legend.text=element_text(size=10),
+        legend.text=element_text(size=8),
+        legend.title=element_text(size=10),
         axis.text=element_text(size=8),
+        axis.title.x=element_text(size=10),
         plot.title=element_text(size=12),
-        plot.subtitle=element_text(size=10)) 
+        plot.subtitle=element_text(size=10))
 
 p4
 ```
@@ -376,19 +394,13 @@ p4
 
 Financial factors had very high variance in responses.  This is likely due to differences in respondents’ socioeconomic status.
 
+\bigskip
 
-
-
-```{r}
+```{r fig.height = 4, fig.width = 7}
 race_financial <- financial %>%
   group_by(race) %>%
   summarise(mean(extent))%>%
   rename("Financial" = "mean(extent)")
-
-race_society <- society %>%
-  group_by(race) %>%
-  summarise(mean(extent)) %>%
-  rename("Society" = "mean(extent)")
 
 race_outinfluences <- outinfluences %>%
   group_by(race) %>%
@@ -400,7 +412,7 @@ race_health <- health %>%
   summarise(mean(extent)) %>%
   rename("Health" = "mean(extent)")
 
-df_list <- list(race_financial, race_society, race_outinfluences, race_health)
+df_list <- list(race_financial, race_outinfluences, race_health)
 
 race_factors <- df_list %>% reduce(full_join, by='race')
 
@@ -409,26 +421,19 @@ race_factors <- pivot_longer(race_factors, cols = !race, names_to = "factor", va
 ggplot(race_factors, aes(x= factor, y = extent)) +
   geom_bar(aes(fill = race), stat = "identity",position = "dodge") +
   scale_fill_brewer(palette = "Set2") +
-  labs(title = "Average Extent by Race", 
+  labs(title = "Average Extent by Ethnicity", 
        x = element_blank(), 
        y = "Average Extent") +
-  guides(fill=guide_legend(title="Race"))+
+  guides(fill=guide_legend(title="Ethnicity"))+
   theme_minimal()
-
-
 ```
 \bigskip
 
-```{r fig.height = 6, fig.width = 10}
+```{r fig.height = 4, fig.width = 7}
 employ_financial <- financial %>%
   group_by(employ) %>%
   summarise(mean(extent))%>%
   rename("Financial" = "mean(extent)")
-
-employ_society <- society %>%
-  group_by(employ) %>%
-  summarise(mean(extent)) %>%
-  rename("Society" = "mean(extent)")
 
 employ_outinfluences <- outinfluences %>%
   group_by(employ) %>%
@@ -440,7 +445,7 @@ employ_health <- health %>%
   summarise(mean(extent)) %>%
   rename("Health" = "mean(extent)")
 
-df_list <- list(employ_financial, employ_society, employ_outinfluences, employ_health)
+df_list <- list(employ_financial, employ_outinfluences, employ_health)
 
 employ_factors <- df_list %>% reduce(full_join, by='employ')
 
@@ -455,16 +460,17 @@ ggplot(employ_factors, aes(x= factor, y = extent)) +
        y = "Average Extent") +
   guides(fill=guide_legend(title="Employment Status"))+
   theme_minimal()
-
-
-
 ```
 
 \bigskip
 
 
-It is important to note that the respondents lived in New Jersey and therefore have a level of privilege regarding healthcare and birth outcomes compared to other areas of the world. This should be considered when evaluating these opinions. It is also important to consider that the racial and economical background based on employment status can have an effect on the way the results are evaluated. 
+It is important to consider how racial and socioeconomic background (based on employment status) may have played a role in how respondents answered these questions.
 
+\bigskip
+\bigskip
+\bigskip
+\bigskip
 
 ## Health Risks Associated with Pregnancy
 
@@ -486,12 +492,13 @@ mat <- maternal_risk %>%
   mutate(RiskLevel = case_when(RiskLevel == "low risk" ~ 0,
                           RiskLevel == "mid risk" ~ 0.5,
                           RiskLevel == "high risk" ~ 1))
-
 cor(mat)
 ```
 
+\bigskip
 
 Since we are exploring what may influence maternal risk levels, we choose the three factors with the strongest relationships with risk as indicated by the correlation matrix: blood sugar, systolic and diastolic blood pressure, and age. We explore each of these relationships below.
+
 
 To examine blood sugar values associated with the three levels of risk, we create a box plot.
 
@@ -501,11 +508,10 @@ To examine blood sugar values associated with the three levels of risk, we creat
 blood_sugar <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(BS, RiskLevel, col = RiskLevel)) +
-  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
+  scale_color_manual(values = c("#eb78c6", "#f0754d", "#40b88e")) +
   labs(title = "Blood Sugar Levels vs. Pregnancy Risk", x = "Blood Sugar") +
   theme_minimal() +
   theme(legend.position = "none") 
-
 
 blood_sugar
 ```
@@ -524,7 +530,7 @@ blood_pressure <- maternal_risk %>%
   ggplot(aes(DiastolicBP,SystolicBP)) +
   geom_smooth(method = "lm", se = FALSE, color = "lightgray", alpha = 0.2) +
   geom_point(aes(x=DiastolicBP, y=SystolicBP, col = RiskLevel)) +
-  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
+  scale_color_manual(values = c("#eb78c6", "#f0754d", "#40b88e")) +
   labs(title = "Systolic Blood Pressure vs. Diastolic Blood Pressure", subtitle = "Faceted by Risk Level") +
   facet_wrap(~ RiskLevel) +
   theme_minimal()
@@ -536,6 +542,7 @@ blood_pressure
 
 It is again clear that high values of these indicators correlates with increased pregnancy risk, though this correlation appears to be slightly weaker than blood sugar. This also confirms the direct relationship between Systolic and Diastolic blood pressure levels predicted in the correlation matrix, as indicated by the trend lines.
 
+
 Finally, we examine age.
 
 \bigskip
@@ -544,7 +551,7 @@ Finally, we examine age.
 age <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(Age, RiskLevel, col = RiskLevel)) +
-  scale_color_manual(values = c("#993796", "#e6255f", "#fa7a2a")) +
+  scale_color_manual(values = c("#eb78c6", "#f0754d", "#40b88e")) +
   labs(title = "Age vs. Pregnancy Risk Level") +
   theme_minimal() +
   theme(legend.position = "none")
@@ -560,18 +567,16 @@ It is important to consider how age might correlate with the other factors recor
 
 
 ## Conclusion
-Overall, we saw that there were multiple aspects that relate to a woman’s decision not to have a child. One major factor is accessibility to healthcare. A lot of women don’t have proper access to healthcare which makes it difficult for them to seek proper medical help in relation to birth. Another major factor is the financial and societal aspects of pregnancy. Outside influences such as societal pressures and financial factors like fertility treatment and adoption costs have an impact on a woman’s decision to become pregnant. Health factors are also a major influence, including high blood pressure and age, which can make pregnancy riskier and correlate with women deciding not to get pregnant and have children. 
+Overall, it is clear that there are multiple aspects that influence a woman’s decision to have or not have children. One major factor is the difference in healthcare access. Many women do not have accessible, quality healthcare, making it difficult for them to seek proper medical help when pregnant. Others include perceptions regarding health, financial, and societal factors that influence prospective mothers. Measurable health factors are also a major influence, including high blood pressure and age, which can make pregnancy risky. These could be deterrents for women thinking of having children. 
 
 
-It's important to consider that there are certain limitations with out survey data, considering that its population is from New Jersey. This accounts for the specific racial distribution and employment status distribution that we see. 
+It's important to consider that there are certain limitations with our survey data, of which the survey population is from New Jersey. This population has a specific level of healthcare access that should be accounted for in analyzing their responses.
 
 
-These visualizations can be useful aids to help women better understand the factors to consider when considering getting pregnant. 
+These visualizations can be useful aids to help women better understand which factors to consider when thinking about getting pregnant. Visualizing these different factors is also a very relevant issue, considering the current discussions relating to the leaked decision to overturn Roe v. Wade. 
 
 
-Visualizing these different factors is also a very relevant issue, considering the current discussions relating to the leaked decision to overturn Roe v. Wade. These are different aspects that can factor into a woman’s decision when it comes to pregnancy and birth and our visualizations aid in understanding these influences.
-
-If given the opportunity to develop this project, we would like to add survey data from other areas to be more representative of women in general. We would also like to consider other factors such as pregnancy and birth education for women in different areas. These visualizations can be used as an educational tool for women and considering the access that women have to other resources like this can have an affect on decisions about pregnancy and birth. 
+If given the opportunity to further develop this project, we would like to add survey data from other areas to be more representative of women in general. We would also like to consider other factors such as pregnancy and birth education or sexual health practices for women in different areas. These visualizations can be used as an educational tool for women and considering the access that women have to other resources like this can have an affect on decisions about pregnancy and birth. 
 
 
 ## References
