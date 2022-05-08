@@ -183,7 +183,7 @@ The colors and select labels also corroborate the geographical trends illustrate
 
 ### The Survey Data
 
-The following graphs visualize data from surveys to track societal attitudes towards having children. The survey tracked how much women agreed with certain preconceptions about birth as well as to what extent they felt certain factors influenced the decision to have or not have children.  Respondents were women living in New Jersey.
+The following graphs visualize data from a survey which tracked how much women agreed with certain preconceptions about birth as well as to what extent they felt certain factors influenced the decision to have or not have children.  
 
 ```{r, warning = FALSE, message = FALSE}
 nj <- read_csv("njsurvey.csv")
@@ -567,16 +567,11 @@ It is important to consider how age might correlate with the other factors recor
 
 
 ## Conclusion
-Overall, it is clear that there are multiple aspects that influence a woman’s decision to have or not have children. One major factor is the difference in healthcare access. Many women do not have accessible, quality healthcare, making it difficult for them to seek proper medical help when pregnant. Others include perceptions regarding health, financial, and societal factors that influence prospective mothers. Measurable health factors are also a major influence, including high blood pressure and age, which can make pregnancy risky. These could be deterrents for women thinking of having children. 
+There are multiple aspects that influence a woman’s decision to have or not have children. One major factor is the difference in healthcare access. Many women do not have accessible, quality healthcare, making it difficult for them to seek proper medical help when pregnant. Others include perceptions regarding health, financial, and societal factors that influence prospective mothers. Measurable health factors are also a major influence, including high blood pressure and age, which can make pregnancy risky. These could be deterrents for women thinking of having children. 
 
 
-It's important to consider that there are certain limitations with our survey data, of which the survey population is from New Jersey. This population has a specific level of healthcare access that should be accounted for in analyzing their responses.
+If given the opportunity to further develop this project, we would like to add survey data from other areas to be more representative and to consider other factors such as pregnancy and birth education or sexual health practices for women in different areas. These visualizations can be an educational tool for women and considering the access that women have to other resources like this can influence decisions about pregnancy and birth.
 
-
-These visualizations can be useful aids to help women better understand which factors to consider when thinking about getting pregnant. Visualizing these different factors is also a very relevant issue, considering the current discussions relating to the leaked decision to overturn Roe v. Wade. 
-
-
-If given the opportunity to further develop this project, we would like to add survey data from other areas to be more representative of women in general. We would also like to consider other factors such as pregnancy and birth education or sexual health practices for women in different areas. These visualizations can be used as an educational tool for women and considering the access that women have to other resources like this can have an affect on decisions about pregnancy and birth. 
 
 
 ## References
