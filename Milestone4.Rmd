@@ -1,7 +1,7 @@
 ---
-title: "Milestone 3"
+title: "What Influences the Decision to Have or Not Have Children?"
 author: "Anisha Gondesi, Mikayla Lamping, Michaela Suski"
-date: "4/10/2022"
+date: "5/8/2022"
 output: pdf_document
 ---
 
@@ -21,11 +21,10 @@ library(sf)
 library(ggrepel)
 ```
 
-# What Influences the Decision to Have or Not Have Children?
 
 There are many reasons why women all over the world choose not to become pregnant and have children.  Across different geographies, populations, and cultures, these reasons may be financial, social, physical or otherwise.  This report aims to help visualize the reasons why women may not want to have children or become pregnant.
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 mortality <- read_csv("global_mortality.csv") %>%
   filter(year == 2015) %>%
   mutate(maternal = `Maternal deaths (%)`,
@@ -45,7 +44,7 @@ haq <- read_csv("haq_index.csv") %>%
   select(c(country,country_code, haq))
 ```
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 countries_ <- intersect(mortality$country, haq$country)
 
 mortality <- mortality %>%
@@ -56,7 +55,7 @@ haq <- haq %>%
 global_ <- inner_join(mortality, haq)
 ```
 
-```{r fig.height = 8, fig.width = 15}
+```{r fig.height = 8, fig.width = 15, warning = FALSE, message = FALSE}
 library(maps)
 world_map <- map_data(map = "world") %>% 
   filter(region != "Antarctica")
@@ -67,7 +66,7 @@ global_$country[42] = "Ivory Coast"
 global_$country[40] = "Republic of Congo"
 ```
 
-```{r fig.height = 10, fig.width = 12}
+```{r fig.height = 10, fig.width = 12, warning = FALSE, message = FALSE}
 p1 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = maternal), map = world_map) +
   geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'white', fill = NA, size = 0.2) +
@@ -77,7 +76,7 @@ p1 <- ggplot() +
   #theme(legend.position = "bottom")
 ```
 
-```{r fig.height = 5, fig.width = 7}
+```{r fig.height = 5, fig.width = 7, warning = FALSE, message = FALSE}
 p2 <- ggplot() +
   geom_map(data = global_, aes(map_id = country, fill = haq), map = world_map) +
   geom_polygon(data = world_map, aes(x = long, y = lat, group = group), colour = 'white', fill = NA, size = 0.2) +
@@ -87,7 +86,6 @@ p2 <- ggplot() +
   theme_void()
 
 (p1 / p2) + plot_annotation(title = "Maternal Mortality Rate and HAQ* Index by Country") 
-ggsave("maps.pdf")
 ```
 
 
@@ -103,7 +101,7 @@ The relationship between HAQ Index and Maternal Mortality Rate is also shown in 
 \bigskip
 \bigskip
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 skilled <- read_csv("birthAttendedBySkilledPersonal.csv") %>% 
   mutate(country = Location,
          skilled_attendant = `First Tooltip`,
@@ -126,7 +124,7 @@ skilled$country[182] = "Venezuela"
 skilled$country[183] = "Vietnam"
 ```
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 continents <- read_csv("countries-continents.csv") %>%
   mutate(country = Country,
          continent = Continent) %>%
@@ -140,7 +138,7 @@ global <- inner_join(global_, skilled_)
 global <- inner_join(global, continents)
 ```
 
-```{r fig.height = 8, fig.width = 8}
+```{r fig.height = 8, fig.width = 8, warning = FALSE, message = FALSE}
 p3 <- suppressWarnings(ggplot(global) +
   geom_point(aes(haq, maternal, col = continent), size = 2) +
   geom_text_repel(aes(haq, maternal, 
@@ -155,7 +153,7 @@ p3 <- suppressWarnings(ggplot(global) +
 )
 ```
 
-```{r fig.height = 6, fig.width = 6}
+```{r fig.height = 7, fig.width = 10, warning = FALSE, message = FALSE}
 p4 <- suppressWarnings(ggplot(global) +
   geom_point(aes(haq, skilled_attendant, col = continent), size = 2) +
   geom_text_repel(aes(haq, skilled_attendant, 
@@ -170,7 +168,6 @@ p4 <- suppressWarnings(ggplot(global) +
 )
 
 p3 / p4
-ggsave("scatter.pdf")
 ```
 
 Both plots show how lower quality healthcare and limited access to it is related to both factors influencing birth outcomes (% skilled attendants) as well as the outcomes themselves (maternal mortality).
@@ -178,26 +175,11 @@ Both plots show how lower quality healthcare and limited access to it is related
 
 ## Social Attitudes Towards not Having Children
 
-```{r}
-nj <- read_csv("njsurvey.csv")
-q <- read_csv("questions.csv")
-```
-
-```{r}
-nj <- nj %>%
-  subset(Gender != "Male")
-```
-
-```{r}
-nj <- subset (nj, select = -Q7) %>%
-  rename(employ = "Employment Status")
-```
-
 ### The Survey Data
 
 The following graphs visualize data from surveys to track societal attitudes towards having children. The survey data included the extent to which they agreed to various statements regarding societal attitudes towards having children. 
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 nj <- read_csv("njsurvey.csv")
 q <- read_csv("questions.csv")
 
@@ -249,7 +231,7 @@ health <- health %>% pivot_longer(
 ```
 
 
-```{r, fig.width = 7, fig.height = 6}
+```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
 question_nums <- unique(health$question)
 question_text <- c("Middle aged women are probably infertile", "Middle aged women will face health complications", "Women without children live longer than those who do", "Women should be physically fit before having children", "Pregnancy can cause high blood pressure, depression or anxiety", "Health risks outweigh benefits", "Young women shouldn't have health concerns","Women should not consider health risks when choosing to have a ahild", "Pregnancy after the age of 30 has lots of risks", "Biologically, it's too late to have a child after mid-thirties")
 
@@ -285,7 +267,7 @@ p1
 Respondents largely disagree with stereotypical health preconceptions one might have about pregnancy and birth.
 
 
-```{r, fig.width = 7, fig.height = 6}
+```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
 question_nums <- unique(outinfluences$question)
 question_text <- c("Negative Stories about Childbirth", "Negative Messages about Single Parent Households", "Family/Religion", "Pressure from Peers", "Fear of Poor Parenting Skills", "Societal Pressure to have Children", "Societal Perception that Same Sex Relationships cannot have Children", "Traditional Views that a Woman's duty is to have a Child")
 
@@ -321,7 +303,7 @@ p2
 Societal pressure is a strong influence while more local, personal influences like peer pressure and negative childbirth stores are not.
 
 
-```{r, fig.width = 7, fig.height = 6}
+```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
 question_nums <- unique(society$question)
 question_text <- c("It is reasonable for a woman to not have a child", "Society has a negative opinion about women who choose not to have a child", "Women who choose to not have a child are making a poor decision", "Women and Men who choose to not have a child are viewed the same", "Women who choose not to have a child are selfish")
 
@@ -359,7 +341,7 @@ Responses regarding societal preconceptions were much more polarized than other 
 
 
 
-```{r, fig.width = 7, fig.height = 6}
+```{r, fig.width = 10, fig.height = 6, warning = FALSE, message = FALSE}
 question_nums <- unique(financial$question)
 question_text <- c("Financial Instability", "Childcare Costs", "Judgement because of a Decision based on Finances", "High Opportunity Cost in losing Potential Earnings", "High Cost of Fertility Treatments/Adoption", "No Financial Support from Partner")
 
@@ -394,12 +376,99 @@ p4
 
 Financial factors had very high variance in responses.  This is likely due to differences in respondents’ socioeconomic status.
 
-It is important to note that the respondents lived in New Jersey and therefore have a level of privilege regarding healthcare and birth outcomes compared to other areas of the world. This should be considered when evaluating these opinions.
+
+
+
+```{r}
+race_financial <- financial %>%
+  group_by(race) %>%
+  summarise(mean(extent))%>%
+  rename("Financial" = "mean(extent)")
+
+race_society <- society %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Society" = "mean(extent)")
+
+race_outinfluences <- outinfluences %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Outside Influences" = "mean(extent)")
+
+race_health <- health %>%
+  group_by(race) %>%
+  summarise(mean(extent)) %>%
+  rename("Health" = "mean(extent)")
+
+df_list <- list(race_financial, race_society, race_outinfluences, race_health)
+
+race_factors <- df_list %>% reduce(full_join, by='race')
+
+race_factors <- pivot_longer(race_factors, cols = !race, names_to = "factor", values_to = "extent")
+
+ggplot(race_factors, aes(x= factor, y = extent)) +
+  geom_bar(aes(fill = race), stat = "identity",position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Average Extent by Race", 
+       x = element_blank(), 
+       y = "Average Extent") +
+  guides(fill=guide_legend(title="Race"))+
+  theme_minimal()
+
+
+```
+\bigskip
+
+```{r fig.height = 6, fig.width = 10}
+employ_financial <- financial %>%
+  group_by(employ) %>%
+  summarise(mean(extent))%>%
+  rename("Financial" = "mean(extent)")
+
+employ_society <- society %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Society" = "mean(extent)")
+
+employ_outinfluences <- outinfluences %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Outside Influences" = "mean(extent)")
+
+employ_health <- health %>%
+  group_by(employ) %>%
+  summarise(mean(extent)) %>%
+  rename("Health" = "mean(extent)")
+
+df_list <- list(employ_financial, employ_society, employ_outinfluences, employ_health)
+
+employ_factors <- df_list %>% reduce(full_join, by='employ')
+
+employ_factors <- pivot_longer(employ_factors, cols = !employ, names_to = "factor", values_to = "extent")
+
+
+ggplot(employ_factors, aes(x= factor, y = extent)) +
+  geom_bar(aes(fill = employ), stat = "identity",position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Average Extent by Employment Status", 
+       x = element_blank(), 
+       y = "Average Extent") +
+  guides(fill=guide_legend(title="Employment Status"))+
+  theme_minimal()
+
+
+
+```
+
+\bigskip
+
+
+It is important to note that the respondents lived in New Jersey and therefore have a level of privilege regarding healthcare and birth outcomes compared to other areas of the world. This should be considered when evaluating these opinions. It is also important to consider that the racial and economical background based on employment status can have an effect on the way the results are evaluated. 
 
 
 ## Health Risks Associated with Pregnancy
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 maternal_risk <- read_csv("MaternalHealthRiskDataSet.csv", show_col_types = FALSE)
 
 # update risk factor levels
@@ -412,7 +481,7 @@ maternal_risk <- maternal_risk %>%
 
 We examine how each factor is correlated in the matrix below.
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 mat <- maternal_risk %>%
   mutate(RiskLevel = case_when(RiskLevel == "low risk" ~ 0,
                           RiskLevel == "mid risk" ~ 0.5,
@@ -428,7 +497,7 @@ To examine blood sugar values associated with the three levels of risk, we creat
 
 \bigskip
 
-```{r fig.height = 3.5, fig.width = 6}
+```{r fig.height = 3.5, fig.width = 6, warning = FALSE, message = FALSE}
 blood_sugar <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(BS, RiskLevel, col = RiskLevel)) +
@@ -450,7 +519,7 @@ Next, we examine blood pressure (both Systolic and Diastolic) and risk.
 
 \bigskip
 
-```{r fig.height = 3.5, fig.width = 6}
+```{r fig.height = 3.5, fig.width = 6, warning = FALSE, message = FALSE}
 blood_pressure <- maternal_risk %>%
   ggplot(aes(DiastolicBP,SystolicBP)) +
   geom_smooth(method = "lm", se = FALSE, color = "lightgray", alpha = 0.2) +
@@ -471,7 +540,7 @@ Finally, we examine age.
 
 \bigskip
 
-```{r fig.height = 3.5, fig.width = 6}
+```{r fig.height = 3.5, fig.width = 6, warning = FALSE, message = FALSE}
 age <- maternal_risk %>%
   ggplot() +
   geom_boxplot(aes(Age, RiskLevel, col = RiskLevel)) +
@@ -493,7 +562,16 @@ It is important to consider how age might correlate with the other factors recor
 ## Conclusion
 Overall, we saw that there were multiple aspects that relate to a woman’s decision not to have a child. One major factor is accessibility to healthcare. A lot of women don’t have proper access to healthcare which makes it difficult for them to seek proper medical help in relation to birth. Another major factor is the financial and societal aspects of pregnancy. Outside influences such as societal pressures and financial factors like fertility treatment and adoption costs have an impact on a woman’s decision to become pregnant. Health factors are also a major influence, including high blood pressure and age, which can make pregnancy riskier and correlate with women deciding not to get pregnant and have children. 
 
+
+It's important to consider that there are certain limitations with out survey data, considering that its population is from New Jersey. This accounts for the specific racial distribution and employment status distribution that we see. 
+
+
+These visualizations can be useful aids to help women better understand the factors to consider when considering getting pregnant. 
+
+
 Visualizing these different factors is also a very relevant issue, considering the current discussions relating to the leaked decision to overturn Roe v. Wade. These are different aspects that can factor into a woman’s decision when it comes to pregnancy and birth and our visualizations aid in understanding these influences.
+
+If given the opportunity to develop this project, we would like to add survey data from other areas to be more representative of women in general. We would also like to consider other factors such as pregnancy and birth education for women in different areas. These visualizations can be used as an educational tool for women and considering the access that women have to other resources like this can have an affect on decisions about pregnancy and birth. 
 
 
 ## References
@@ -513,5 +591,6 @@ Safrit, Catherine. (2021, December). Maternal Health Risk Data. Retrieved Februa
 
 Zeus. (2021). World Health Statistics 2020 | Complete | Geo-Analysis. Retrieved April 10, 2022 
 from https://www.kaggle.com/datasets/utkarshxy/who-worldhealth-statistics-2020-complete?select=birthAttendedBySkilledPersonal.csv. 
+
 
 
